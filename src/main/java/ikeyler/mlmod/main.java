@@ -1,9 +1,10 @@
 package ikeyler.mlmod;
 
-import ikeyler.mlmod.Configuration.ClothConfig;
-import ikeyler.mlmod.Configuration.Config;
-import ikeyler.mlmod.Messages.Manager;
-import ikeyler.mlmod.Messages.Messages;
+import ikeyler.mlmod.cfg.ClothConfig;
+import ikeyler.mlmod.cfg.Config;
+import ikeyler.mlmod.messages.MessageCollector;
+import ikeyler.mlmod.messages.Manager;
+import ikeyler.mlmod.messages.Messages;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -15,12 +16,10 @@ import org.apache.logging.log4j.Logger;
 
 @Mod("mlmod")
 public class main {
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger logger = LogManager.getLogger();
     public static final String prefix = "§8» §f";
-    public static final String MOD_ID = "mlmod";
-    public static final String NAME = "MLMod";
-    public static final String VERSION = "0.7.1";
     public static final Manager messageManager = new Manager();
+    public static final MessageCollector messageCollector = new MessageCollector();
 
     public main() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.spec);
@@ -29,5 +28,6 @@ public class main {
         messageManager.addMessages(Messages.AD_MESSAGES);
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (client, parent) -> ClothConfig.buildConfigScreen(Minecraft.getInstance().screen));
         Messages.updateMessages();
+        Keybinds.register();
     }
 }
