@@ -1,19 +1,21 @@
 package ikeyler.mlmod.util;
 
+import com.mojang.authlib.GameProfile;
+import ikeyler.mlmod.itemeditor.ItemEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.play.client.CCreativeInventoryActionPacket;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemUtil {
 
-    // todo item lore editor
     static Minecraft mc = Minecraft.getInstance();
     public static void updateInventory(int slot, ItemStack item) {
         if (mc.hasSingleplayerServer()) {
@@ -24,36 +26,29 @@ public class ItemUtil {
             try {mc.getConnection().send(new CCreativeInventoryActionPacket(slot, item));} catch (Exception ignore) {}
         }
     }
-    public static List<ITextComponent> getItemLore(ItemStack stack) {
-        List<ITextComponent> lore = new ArrayList<>();
-        if (stack.hasTag() && stack.getTag().contains("display")) {
-            CompoundNBT display = stack.getTag().getCompound("display");
-            if (display.contains("Lore")) {
-                ListNBT loreTag = display.getList("Lore", 8);
-                for (int i = 0; i < loreTag.size(); i++) {
-                    lore.add(ITextComponent.Serializer.fromJson(loreTag.getString(i)));
-                }
-            }
-        }
-        return lore;
+    public static ItemStack getPlayerHead(String playerName) {
+        // todo need to get player uuid from https://api.mojang.com/users/profiles/minecraft/
+        // and write it to the itemstack
+        ItemStack head = new ItemStack(Items.PLAYER_HEAD, 1);
+        CompoundNBT tag = head.getOrCreateTag();
+        head.setHoverName(new StringTextComponent(playerName));
+        GameProfile profile = new GameProfile(null, playerName);
+        mc.getMinecraftSessionService().fillProfileProperties(profile, true);
+        tag.put("SkullOwner", NBTUtil.writeGameProfile(new CompoundNBT(), profile));
+        return head;
     }
-    public static void setItemLore(ItemStack stack, List<ITextComponent> lore) {
-        CompoundNBT display = stack.getOrCreateTagElement("display");
-        ListNBT loreTag = new ListNBT();
-        for (ITextComponent line:lore) {
-            loreTag.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(line)));
+    public static ItemStack getDynamicVar(boolean saved) {
+        ItemStack item = new ItemStack(Items.MAGMA_CREAM);
+        if (saved) {
+            CompoundNBT display = item.getOrCreateTagElement("display");
+            display.putString("LocName", "save");
+            List<String> lore = new ArrayList<>();
+            lore.add(new TranslationTextComponent("mlmod.var_saved").getString());
+            lore.add(" ");
+            ItemEditor.setLore(item, lore);
+            return item;
         }
-        display.put("Lore", loreTag);
-    }
-    public static void addItemLore(ItemStack stack, ITextComponent lore) {
-        CompoundNBT display = stack.getOrCreateTagElement("display");
-        ListNBT loreTag = display.getList("Lore", 8);
-        loreTag.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(lore)));
-        display.put("Lore", loreTag);
-    }
-    public static void clearItemLore(ItemStack stack) {
-        if (stack.hasTag() && stack.getTag().contains("display")) {
-            stack.getTag().getCompound("display").remove("Lore");
-        }
+        ItemEditor.addLore(item, "");
+        return item;
     }
 }

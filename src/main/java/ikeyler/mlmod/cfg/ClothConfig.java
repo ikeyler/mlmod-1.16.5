@@ -23,41 +23,47 @@ public class ClothConfig {
         ConfigCategory general = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.general"));
         ConfigCategory general_messages = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.messages"));
         ConfigCategory patterns = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.patterns"));
-        ConfigCategory creative_messages = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.messages.creative"));
+        ConfigCategory creative = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.creative"));
+        ConfigCategory chat_formatting = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.chat_formatting"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
         // general
-        TextListEntry general_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.general.desc")).build();
+        TextListEntry general_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.general.tooltip")).build();
         List<String> ignoredPlayers = new ArrayList<>(Config.IGNORED_PLAYERS.get());
         StringListListEntry ignored_players = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.ignored_players"),
                 ignoredPlayers)
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.ignored_players.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.ignored_players.tooltip"))
                 .setDefaultValue(Collections.emptyList())
                 .setSaveConsumer(Config.IGNORED_PLAYERS::set)
                 .build();
         BooleanListEntry chat_player_interact = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.chat_player_interact"), Config.CHAT_PLAYER_INTERACT.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.chat_player_interact.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.chat_player_interact.tooltip"))
                 .setDefaultValue(false)
                 .setSaveConsumer(Config.CHAT_PLAYER_INTERACT::set)
                 .build();
         BooleanListEntry ads = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.ads"), Config.ADS.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.ads.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.ads.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.ADS::set)
                 .build();
         BooleanListEntry pm_notification = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.pm_notification"), Config.PM_NOTIFICATION.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.pm_notification.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.pm_notification.tooltip"))
                 .setDefaultValue(false)
                 .setSaveConsumer(Config.PM_NOTIFICATION::set)
                 .build();
         BooleanListEntry message_collector = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.message_collector"), Config.MESSAGE_COLLECTOR.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.message_collector.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.message_collector.tooltip"))
                 .setDefaultValue(false)
                 .setSaveConsumer(Config.MESSAGE_COLLECTOR::set)
                 .build();
+        BooleanListEntry hide_translate = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.hide_translate"), Config.HIDE_TRANSLATE.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.hide_translate.tooltip"))
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.HIDE_TRANSLATE::set)
+                .build();
 
         // main messages
-        TextListEntry general_messages_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.messages.desc")).build();
+        TextListEntry general_messages_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.messages.tooltip")).build();
         BooleanListEntry reward_storage = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.reward_storage"), Config.REWARD_STORAGE.get())
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.REWARD_STORAGE::set)
@@ -67,27 +73,27 @@ public class ClothConfig {
                 .setSaveConsumer(Config.WELCOME_TO_MINELAND::set)
                 .build();
         BooleanListEntry unanswered_asks = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.unanswered_asks"), Config.UNANSWERED_ASKS.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.unanswered_asks.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.unanswered_asks.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.UNANSWERED_ASKS::set)
                 .build();
         BooleanListEntry unread_mail = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.unread_mail"), Config.UNREAD_MAIL.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.unread_mail.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.unread_mail.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.UNREAD_MAIL::set)
                 .build();
         BooleanListEntry new_video = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.new_video"), Config.NEW_VIDEO.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.new_video.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.new_video.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.NEW_VIDEO::set)
                 .build();
         BooleanListEntry punishment_broadcast = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.punishment_broadcast"), Config.PUNISHMENT_BROADCAST.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.punishment_broadcast.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.punishment_broadcast.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.PUNISHMENT_BROADCAST::set)
                 .build();
         BooleanListEntry donation = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.donation"), Config.DONATION.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.donation.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.donation.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.DONATION::set)
                 .build();
@@ -105,7 +111,7 @@ public class ClothConfig {
                 .build();
 
         // creative
-        TextListEntry creative_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.messages.creative.desc")).build();
+        TextListEntry creative_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.creative.tooltip")).build();
         BooleanListEntry world_invite = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.world_invite"), Config.WORLD_INVITE.get())
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.WORLD_INVITE::set)
@@ -115,13 +121,32 @@ public class ClothConfig {
                 .setSaveConsumer(Config.DEV_MODE_JOIN::set)
                 .build();
         BooleanListEntry show_world_id = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.show_world_id"), Config.SHOW_WORLD_ID.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.show_world_id.desc"))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.show_world_id.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.SHOW_WORLD_ID::set)
                 .build();
+        BooleanListEntry excl_mark_to_cc = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.excl_mark_to_cc"), Config.EXCL_MARK_TO_CC.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.excl_mark_to_cc.tooltip"))
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.EXCL_MARK_TO_CC::set)
+                .build();
+        BooleanListEntry play_sound = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.play_sound"), Config.PLAY_SOUND.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.play_sound.tooltip"))
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.PLAY_SOUND::set)
+                .build();
+        BooleanListEntry sound_command = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.sound_command"), Config.SOUND_COMMAND.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.sound_command.tooltip"))
+                .setDefaultValue(true)
+                .setSaveConsumer(Config.SOUND_COMMAND::set)
+                .build();
+        BooleanListEntry dev_night_mode = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.dev_night_mode"), Config.DEV_NIGHT_MODE.get())
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.DEV_NIGHT_MODE::set)
+                .build();
 
         // patterns
-        TextListEntry patterns_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.patterns.desc")).build();
+        TextListEntry patterns_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.patterns.tooltip")).build();
         StringListEntry reward_storage_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.reward_storage"), Config.REWARD_STORAGE_PATTERN.get())
                 .setDefaultValue(Messages.REWARD_STORAGE.getFixedTemplate())
                 .setSaveConsumer(value -> {Config.REWARD_STORAGE_PATTERN.set(value); Messages.REWARD_STORAGE.setNewTemplate(value);})
@@ -171,19 +196,39 @@ public class ClothConfig {
                 .setSaveConsumer(value -> {Config.NEW_ASK_PATTERN.set(value); Messages.NEW_ASK.setNewTemplate(value);})
                 .build();
 
-        general.addEntry(general_description).addEntry(ignored_players).addEntry(chat_player_interact).addEntry(ads).addEntry(pm_notification).addEntry(message_collector);
+        // formatting
+        BooleanListEntry formatting = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.chat_formatting"), Config.CHAT_FORMATTING.get())
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.CHAT_FORMATTING::set)
+                .build();
+        StringListEntry formatting_cc = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.chat_formatting_cc"), Config.FORMATTING_CC.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.chat_formatting_cc.tooltip"))
+                .setDefaultValue("&3CC &8|")
+                .setSaveConsumer(Config.FORMATTING_CC::set)
+                .build();
+        StringListEntry formatting_dc = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.chat_formatting_dc"), Config.FORMATTING_DC.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.chat_formatting_dc.tooltip"))
+                .setDefaultValue("&2DC &8|")
+                .setSaveConsumer(Config.FORMATTING_DC::set)
+                .build();
+
+        general.addEntry(general_description).addEntry(ignored_players).addEntry(chat_player_interact).addEntry(ads)
+                .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate);
 
         general_messages.addEntry(general_messages_description).addEntry(reward_storage).addEntry(welcome_to_mineland).addEntry(unanswered_asks).addEntry(unread_mail)
                 .addEntry(new_video).addEntry(punishment_broadcast).addEntry(donation).addEntry(player_voted)
                 .addEntry(stream).addEntry(new_ask);
 
-        creative_messages.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join);
+        creative.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join).addEntry(excl_mark_to_cc)
+                .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode);
+
         patterns.addEntry(patterns_description).addEntry(welcome_pattern).addEntry(dev_mode_join_pattern)
                 .addEntry(reward_storage_pattern).addEntry(unanswered_asks_pattern)
                 .addEntry(unread_mail_pattern).addEntry(world_invite_pattern)
                 .addEntry(new_video_pattern).addEntry(punishment_broadcast_pattern).addEntry(donation_pattern)
                 .addEntry(player_voted_pattern).addEntry(stream_pattern).addEntry(new_ask_pattern);
 
+        chat_formatting.addEntry(formatting).addEntry(formatting_cc).addEntry(formatting_dc);
         builder.setSavingRunnable(() -> {Config.spec.save(); Messages.updateMessages();});
         return builder.build();
     }

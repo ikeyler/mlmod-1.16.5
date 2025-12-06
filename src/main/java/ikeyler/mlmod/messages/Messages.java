@@ -65,8 +65,15 @@ public class Messages {
     public static final Message NEW_ASK = new Message("Вопросы » Вопрос от (.*?)\\. Сервер: (.*?)\\.");
     public static final Message CREATIVE_CHAT = new Message("Креатив-чат » (.*?): (.*?)");
     public static final Message DONATE_CHAT = new Message("Донат-чат » (.*?): (.*?)");
+    public static final Message PARTY_CHAT = new Message("Party (.*?) » ?(.*?)");
     public static final Message PM = new Message("✉ » (\\S+) -> тебе \\| (.*?)");
     public static final Message PM_REPLY = new Message("✉ » ты -> (\\S+) \\| (.*?)");
+
+    public static final Message CC_DISABLED = new Message(" \\| \\[ОПОВЕЩЕНИЕ\\]");
+    public static final Message CC_DISABLED2 = new Message(" \\| На Sharded отключен глобальный чат\\. Зачем\\?");
+    public static final Message CC_DISABLED3 = new Message(" \\| Вместо него был создан креатив-чат - \\/cc");
+    public static final Message CC_DISABLED4 = new Message(" \\| Хочешь включить и общаться с игроками\\? - \\/cc on");
+    public static final Message CC_DISABLED5 = new Message(" \\| Мешает этот чат\\? - \\/cc off");
 
     // ad messages
     public static final Message AD_DELIMITER = new Message(" ");
@@ -148,10 +155,10 @@ public class Messages {
     public static final Message AD_CREATIVE_TG2 = new Message(" \\| Там обсуждают закрытую информацию\\.");
     public static final Message AD_CREATIVE_TG3 = new Message(" \\| Заходи в Telegram: mineland\\.net\\/tg");
 
-
     public static final List<Message> MESSAGES = new ArrayList<>(
             Arrays.asList(REWARD_STORAGE, WELCOME_TO_MINELAND, DEV_MODE_JOIN, UNREAD_MAIL, UNANSWERED_ASKS, WORLD_INVITE, NEW_VIDEO, PUNISHMENT_BROADCAST,
-            DONATION, PLAYER_VOTED, STREAM, NEW_ASK, CREATIVE_CHAT, DONATE_CHAT, PM, PM_REPLY)
+                    DONATION, PLAYER_VOTED, STREAM, NEW_ASK, CREATIVE_CHAT, DONATE_CHAT, PM, PM_REPLY, PARTY_CHAT,
+                    CC_DISABLED, CC_DISABLED2, CC_DISABLED3, CC_DISABLED4, CC_DISABLED5)
     );
 
     public static final List<Message> AD_MESSAGES = new ArrayList<>(
@@ -170,26 +177,12 @@ public class Messages {
                     AD_LICENSE, AD_LICENSE2, AD_LICENSE3, AD_LICENSE4, AD_LICENSE5,
                     AD_COSMETICS, AD_COSMETICS2, AD_COSMETICS3, AD_COSMETICS4,
                     AD_CREATIVE_TG, AD_CREATIVE_TG2, AD_CREATIVE_TG3
-                    )
+            )
     );
 
     public static void updateMessages() {
-        REWARD_STORAGE.setNewTemplate(Config.REWARD_STORAGE_PATTERN.get());
-        WELCOME_TO_MINELAND.setNewTemplate(Config.WELCOME_PATTERN.get());
-        DEV_MODE_JOIN.setNewTemplate(Config.DEV_MODE_JOIN_PATTERN.get());
-        UNREAD_MAIL.setNewTemplate(Config.UNREAD_MAIL_PATTERN.get());
-        UNANSWERED_ASKS.setNewTemplate(Config.UNANSWERED_ASKS_PATTERN.get());
-        WORLD_INVITE.setNewTemplate(Config.WORLD_INVITE_PATTERN.get());
-        NEW_VIDEO.setNewTemplate(Config.NEW_VIDEO_PATTERN.get());
-        PUNISHMENT_BROADCAST.setNewTemplate(Config.PUNISHMENT_BROADCAST_PATTERN.get());
-        DONATION.setNewTemplate(Config.DONATION_PATTERN.get());
-        PLAYER_VOTED.setNewTemplate(Config.PLAYER_VOTED_PATTERN.get());
-        STREAM.setNewTemplate(Config.STREAM_PATTERN.get());
-        NEW_ASK.setNewTemplate(Config.NEW_ASK_PATTERN.get());
-
         REWARD_STORAGE.setActive(Config.REWARD_STORAGE.get());
         WELCOME_TO_MINELAND.setActive(Config.WELCOME_TO_MINELAND.get());
-        DEV_MODE_JOIN.setActive(Config.DEV_MODE_JOIN.get());
         UNREAD_MAIL.setActive(Config.UNREAD_MAIL.get());
         UNANSWERED_ASKS.setActive(Config.UNANSWERED_ASKS.get());
         WORLD_INVITE.setActive(Config.WORLD_INVITE.get());
@@ -199,5 +192,4 @@ public class Messages {
         PLAYER_VOTED.setActive(Config.PLAYER_VOTED.get());
         STREAM.setActive(Config.STREAM.get());
         NEW_ASK.setActive(Config.NEW_ASK.get());
-    }
-}
+    }}

@@ -16,6 +16,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> ADS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> MESSAGE_COLLECTOR;
     public static final ForgeConfigSpec.ConfigValue<Boolean> PM_NOTIFICATION;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> HIDE_TRANSLATE;
 
     // main messages
     public static final ForgeConfigSpec.ConfigValue<Boolean> WELCOME_TO_MINELAND;
@@ -33,6 +34,10 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> WORLD_INVITE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_MODE_JOIN;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SHOW_WORLD_ID;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> EXCL_MARK_TO_CC;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> PLAY_SOUND;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> SOUND_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_NIGHT_MODE;
 
     // message patterns
     public static final ForgeConfigSpec.ConfigValue<String> WELCOME_PATTERN;
@@ -48,15 +53,25 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> STREAM_PATTERN;
     public static final ForgeConfigSpec.ConfigValue<String> NEW_ASK_PATTERN;
 
+    // chat formatting
+    public static final ForgeConfigSpec.ConfigValue<Boolean> CHAT_FORMATTING;
+    public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_CC;
+    public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_DC;
+
     static {
         builder.push("cfg");
 
-        IGNORED_PLAYERS = builder.defineList("ignored_players", Collections.singletonList(""), o->true);
+        IGNORED_PLAYERS = builder.defineList("ignored_players", Collections.emptyList(), o->o instanceof String);
         CHAT_PLAYER_INTERACT = builder.define("chat_player_interact", false);
         ADS = builder.define("ads", true);
         PM_NOTIFICATION = builder.define("pm_notification", false);
         MESSAGE_COLLECTOR = builder.define("message_collector", false);
+        HIDE_TRANSLATE = builder.define("hide_translate", false);
         SHOW_WORLD_ID = builder.define("show_world_id", true);
+        EXCL_MARK_TO_CC = builder.define("excl_mark_to_cc", false);
+        PLAY_SOUND = builder.define("play_sound", false);
+        SOUND_COMMAND = builder.define("sound_command", true);
+        DEV_NIGHT_MODE = builder.define("dev_night_mode", false);
 
         WELCOME_TO_MINELAND = builder.define("welcome_to_mineland", true);
         DEV_MODE_JOIN = builder.define("dev_mode_join", true);
@@ -84,6 +99,11 @@ public class Config {
         PLAYER_VOTED_PATTERN = builder.define("player_voted_pattern", Messages.PLAYER_VOTED.getTemplate());
         STREAM_PATTERN = builder.define("stream_pattern", Messages.STREAM.getTemplate());
         NEW_ASK_PATTERN = builder.define("new_ask_pattern", Messages.NEW_ASK.getTemplate());
+
+        // chat formatting
+        CHAT_FORMATTING = builder.define("chat_formatting", false);
+        FORMATTING_CC = builder.define("formatting_cc", "&3CC &8|");
+        FORMATTING_DC = builder.define("formatting_dc", "&2DC &8|");
 
         builder.pop();
         spec = builder.build();
