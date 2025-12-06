@@ -64,12 +64,13 @@ public class ChatListener {
             mc.gui.getChat().addRecentChat(message);
         }
 
-        if (message.startsWith("!") && Config.EXCL_MARK_TO_CC.get()) {
+        if (message.startsWith("!") && Config.EXCL_MARK_TO_CHAT.get() != Config.CHAT_MODE.OFF) {
             String newMessage = message.replaceFirst("!", "").trim();
             if (newMessage.isEmpty()) return;
             event.setCanceled(true);
             mc.gui.getChat().addRecentChat(message);
-            mc.player.chat("/cc "+newMessage);
+            String chatType = Config.EXCL_MARK_TO_CHAT.get() == Config.CHAT_MODE.CC ? "/cc" : "/dc";
+            mc.player.chat(chatType+" "+newMessage);
             return;
         }
 

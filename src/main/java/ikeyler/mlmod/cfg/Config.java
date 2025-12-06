@@ -1,6 +1,7 @@
 package ikeyler.mlmod.cfg;
 
 import ikeyler.mlmod.messages.Messages;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.Collections;
@@ -17,6 +18,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> MESSAGE_COLLECTOR;
     public static final ForgeConfigSpec.ConfigValue<Boolean> PM_NOTIFICATION;
     public static final ForgeConfigSpec.ConfigValue<Boolean> HIDE_TRANSLATE;
+    public static final ForgeConfigSpec.ConfigValue<CHAT_MODE> EXCL_MARK_TO_CHAT;
 
     // main messages
     public static final ForgeConfigSpec.ConfigValue<Boolean> WELCOME_TO_MINELAND;
@@ -34,7 +36,6 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> WORLD_INVITE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_MODE_JOIN;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SHOW_WORLD_ID;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> EXCL_MARK_TO_CC;
     public static final ForgeConfigSpec.ConfigValue<Boolean> PLAY_SOUND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SOUND_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_NIGHT_MODE;
@@ -58,6 +59,20 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_CC;
     public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_DC;
 
+    public enum CHAT_MODE {
+        DC("mlmod.config.option.excl_mark_to_chat.dc"),
+        CC("mlmod.config.option.excl_mark_to_chat.cc"),
+        OFF("mlmod.config.option.excl_mark_to_chat.off");
+        private final String translation;
+        CHAT_MODE(String translation) {
+            this.translation = translation;
+        }
+        @Override
+        public String toString() {
+            return new TranslationTextComponent(this.translation).getString();
+        }
+    }
+
     static {
         builder.push("cfg");
 
@@ -68,7 +83,7 @@ public class Config {
         MESSAGE_COLLECTOR = builder.define("message_collector", false);
         HIDE_TRANSLATE = builder.define("hide_translate", false);
         SHOW_WORLD_ID = builder.define("show_world_id", true);
-        EXCL_MARK_TO_CC = builder.define("excl_mark_to_cc", false);
+        EXCL_MARK_TO_CHAT = builder.defineEnum("excl_mark_to_chat", CHAT_MODE.OFF);
         PLAY_SOUND = builder.define("play_sound", false);
         SOUND_COMMAND = builder.define("sound_command", true);
         DEV_NIGHT_MODE = builder.define("dev_night_mode", false);

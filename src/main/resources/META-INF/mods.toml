@@ -17,7 +17,7 @@ license = "${mod_license}"
 # The modid of the mod
 modId = "mlmod" #mandatory
 # The version number of the mod
-version = "v1.2" #mandatory
+version = "v1.2b" #mandatory
 # A display name for the mod
 displayName = "MLMod" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/

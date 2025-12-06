@@ -4,16 +4,15 @@ import ikeyler.mlmod.messages.Messages;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
-import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
-import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
-import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
+import me.shedaniel.clothconfig2.gui.entries.*;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static ikeyler.mlmod.Main.messageManager;
 
 public class ClothConfig {
     public static Screen buildConfigScreen(Screen parent) {
@@ -60,6 +59,10 @@ public class ClothConfig {
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.hide_translate.tooltip"))
                 .setDefaultValue(false)
                 .setSaveConsumer(Config.HIDE_TRANSLATE::set)
+                .build();
+        EnumListEntry<Config.CHAT_MODE> excl_mark_to_chat = entryBuilder.startEnumSelector(new TranslationTextComponent("mlmod.config.option.excl_mark_to_chat"), Config.CHAT_MODE.class, Config.EXCL_MARK_TO_CHAT.get())
+                .setDefaultValue(Config.CHAT_MODE.OFF)
+                .setSaveConsumer(Config.EXCL_MARK_TO_CHAT::set)
                 .build();
 
         // main messages
@@ -124,11 +127,6 @@ public class ClothConfig {
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.show_world_id.tooltip"))
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.SHOW_WORLD_ID::set)
-                .build();
-        BooleanListEntry excl_mark_to_cc = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.excl_mark_to_cc"), Config.EXCL_MARK_TO_CC.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.excl_mark_to_cc.tooltip"))
-                .setDefaultValue(false)
-                .setSaveConsumer(Config.EXCL_MARK_TO_CC::set)
                 .build();
         BooleanListEntry play_sound = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.play_sound"), Config.PLAY_SOUND.get())
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.play_sound.tooltip"))
@@ -213,13 +211,13 @@ public class ClothConfig {
                 .build();
 
         general.addEntry(general_description).addEntry(ignored_players).addEntry(chat_player_interact).addEntry(ads)
-                .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate);
+                .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate).addEntry(excl_mark_to_chat);
 
         general_messages.addEntry(general_messages_description).addEntry(reward_storage).addEntry(welcome_to_mineland).addEntry(unanswered_asks).addEntry(unread_mail)
                 .addEntry(new_video).addEntry(punishment_broadcast).addEntry(donation).addEntry(player_voted)
                 .addEntry(stream).addEntry(new_ask);
 
-        creative.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join).addEntry(excl_mark_to_cc)
+        creative.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
                 .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode);
 
         patterns.addEntry(patterns_description).addEntry(welcome_pattern).addEntry(dev_mode_join_pattern)
@@ -229,7 +227,11 @@ public class ClothConfig {
                 .addEntry(player_voted_pattern).addEntry(stream_pattern).addEntry(new_ask_pattern);
 
         chat_formatting.addEntry(formatting).addEntry(formatting_cc).addEntry(formatting_dc);
-        builder.setSavingRunnable(() -> {Config.spec.save(); Messages.updateMessages();});
+        builder.setSavingRunnable(() -> {
+            Config.spec.save();
+            Messages.updateMessages();
+            messageManager.updateIgnoredPlayers();
+        });
         return builder.build();
     }
 }
