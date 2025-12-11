@@ -1,5 +1,6 @@
 package ikeyler.mlmod;
 
+import ikeyler.mlmod.cfg.Config;
 import ikeyler.mlmod.util.ModUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -23,7 +24,8 @@ public class PacketHandler {
         pipeline.addBefore("packet_handler", "packet_interceptor", new ChannelInboundHandlerAdapter() {
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                 if (msg instanceof SUpdateTimePacket && ModUtils.NIGHT_DEV_MODE) {
-                    mc.level.setDayTime(18000L);
+                    if (mc.level != null)
+                        mc.level.setDayTime(Config.DEV_NIGHT_MODE_TIME.get());
                     return;
                 }
                 super.channelRead(ctx, msg);

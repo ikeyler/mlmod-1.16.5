@@ -39,6 +39,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> PLAY_SOUND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SOUND_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_NIGHT_MODE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> DEV_NIGHT_MODE_TIME;
 
     // message patterns
     public static final ForgeConfigSpec.ConfigValue<String> WELCOME_PATTERN;
@@ -87,6 +88,7 @@ public class Config {
         PLAY_SOUND = builder.define("play_sound", false);
         SOUND_COMMAND = builder.define("sound_command", true);
         DEV_NIGHT_MODE = builder.define("dev_night_mode", false);
+        DEV_NIGHT_MODE_TIME = builder.define("dev_night_mode_time", 18000);
 
         WELCOME_TO_MINELAND = builder.define("welcome_to_mineland", true);
         DEV_MODE_JOIN = builder.define("dev_mode_join", true);

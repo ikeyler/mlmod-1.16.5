@@ -143,19 +143,24 @@ public class ChatListener {
                 ItemStack item = null;
                 String[] spl = message.split(" ", 2);
                 String name = spl.length > 1 ? spl[1] : "";
+                String varDesc = null;
                 switch (start.toLowerCase()) {
                     case "/var":
                         item = ItemUtil.getDynamicVar(false);
                         break;
                     case "/text":
                         item = Items.BOOK.getDefaultInstance();
+                        varDesc = "mlmod.var.text.desc";
                         break;
                     case "/num":
                         item = Items.SLIME_BALL.getDefaultInstance();
+                        varDesc = "mlmod.var.number.desc";
                         break;
                 }
                 if (item != null) {
                     item.setHoverName(new StringTextComponent(TextUtil.replaceColorCodes(name)));
+                    if (varDesc != null)
+                        ItemEditor.setLore(item, Arrays.asList(new TranslationTextComponent(varDesc).getString().split("\n")));
                     mc.player.addItem(item);
                     mc.setScreen(new InventoryScreen(mc.player));
                 }

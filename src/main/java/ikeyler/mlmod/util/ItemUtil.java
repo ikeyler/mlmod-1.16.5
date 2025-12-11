@@ -12,6 +12,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemUtil {
@@ -39,16 +40,14 @@ public class ItemUtil {
     }
     public static ItemStack getDynamicVar(boolean saved) {
         ItemStack item = new ItemStack(Items.MAGMA_CREAM);
+        List<String> lore = new ArrayList<>();
         if (saved) {
             CompoundNBT display = item.getOrCreateTagElement("display");
             display.putString("LocName", "save");
-            List<String> lore = new ArrayList<>();
             lore.add(new TranslationTextComponent("mlmod.var_saved").getString());
-            lore.add(" ");
-            ItemEditor.setLore(item, lore);
-            return item;
         }
-        ItemEditor.addLore(item, "");
+        lore.addAll(Arrays.asList(new TranslationTextComponent("mlmod.var.var.desc").getString().split("\n")));
+        ItemEditor.setLore(item, lore);
         return item;
     }
 }

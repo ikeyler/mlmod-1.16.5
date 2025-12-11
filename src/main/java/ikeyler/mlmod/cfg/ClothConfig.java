@@ -142,6 +142,11 @@ public class ClothConfig {
                 .setDefaultValue(false)
                 .setSaveConsumer(Config.DEV_NIGHT_MODE::set)
                 .build();
+        IntegerListEntry dev_night_mode_time = entryBuilder.startIntField(new TranslationTextComponent("mlmod.config.option.dev_night_mode_time"), Config.DEV_NIGHT_MODE_TIME.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.dev_night_mode_time.tooltip"))
+                .setDefaultValue(18000)
+                .setSaveConsumer(Config.DEV_NIGHT_MODE_TIME::set)
+                .build();
 
         // patterns
         TextListEntry patterns_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.patterns.tooltip")).build();
@@ -218,7 +223,7 @@ public class ClothConfig {
                 .addEntry(stream).addEntry(new_ask);
 
         creative.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
-                .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode);
+                .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode).addEntry(dev_night_mode_time);
 
         patterns.addEntry(patterns_description).addEntry(welcome_pattern).addEntry(dev_mode_join_pattern)
                 .addEntry(reward_storage_pattern).addEntry(unanswered_asks_pattern)
