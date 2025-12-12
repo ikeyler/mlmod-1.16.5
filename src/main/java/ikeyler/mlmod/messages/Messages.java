@@ -58,10 +58,7 @@ public class Messages {
             "   \n" +
             "                  \\[Голосовать\\]\n" +
             " ");
-    public static final Message STREAM = new Message(" \n" +
-            " \\| Идет стрим игрока (.*?)\n" +
-            " \\| Кликни, чтобы посмотреть:" +
-            "(.*?)\\]");
+    public static final Message STREAM = new Message(" \n \\| Идет стрим игрока (.*?)\n \\| Кликни, чтобы посмотреть: \n(.*?)\n");
     public static final Message NEW_ASK = new Message("Вопросы » Вопрос от (.*?)\\. Сервер: (.*?)\\.");
     public static final Message CREATIVE_CHAT = new Message("Креатив-чат » (.*?): (.*?)");
     public static final Message DONATE_CHAT = new Message("Донат-чат » (.*?): (.*?)");

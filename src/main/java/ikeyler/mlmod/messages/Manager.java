@@ -88,6 +88,9 @@ public class Manager {
             return;
         }
 
+        /*
+        creative & donate chat handling
+        */
         if (message == Messages.CREATIVE_CHAT || message == Messages.DONATE_CHAT) {
             boolean hideMessage = false;
             boolean setMessage = false;
@@ -123,20 +126,28 @@ public class Manager {
             }
 
             if (Config.CHAT_PLAYER_INTERACT.get()) {
+                String sep = "§§";
                 Style style = messageComponent.getStyle()
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.chat_player_interact.click", player)))
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodplayerinteract " + player + ":::" + msg + ":::" + reply));
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodplayerinteract " + player + sep + msg + sep + reply));
                 messageComponent.setStyle(style);
-                Matcher adMatcher = adPattern.matcher(msg.toLowerCase());
-                List<String> adList = new ArrayList<>();
-                while (adMatcher.find()) {String[] spl = adMatcher.group(0).split(" "); adList.add("/ad "+spl[spl.length-1].replace(",", ""));}
-                if (!adList.isEmpty()) {
-                    Style adStyle = TextUtil.newStyle().
-                            withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodshowmessageads " + String.join(",", adList))).
-                            withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.show_world_ads")));
-                    StringTextComponent adComponent = new StringTextComponent(" ⬈");
-                    adComponent.setStyle(adStyle);
-                    messageComponent.append(adComponent);
+                if (Config.SHOW_MESSAGE_ADS.get()) {
+                    Matcher adMatcher = adPattern.matcher(msg.toLowerCase());
+                    List<String> adList = new ArrayList<>();
+                    while (adMatcher.find()) {
+                        String[] spl = adMatcher.group(0).split(" ");
+                        String adId = spl[spl.length - 1].replace(",", "");
+                        if (!adList.contains(adId))
+                            adList.add("/ad " + adId.replace(",", ""));
+                    }
+                    if (!adList.isEmpty()) {
+                        Style adStyle = TextUtil.newStyle().
+                                withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodshowmessageads " + String.join(",", adList))).
+                                withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.show_world_ads")));
+                        StringTextComponent adComponent = new StringTextComponent(" ⬈");
+                        adComponent.setStyle(adStyle);
+                        messageComponent.append(adComponent);
+                    }
                 }
                 setMessage = true;
             }
@@ -169,11 +180,25 @@ public class Manager {
             return;
         }
 
-        if (message == Messages.WORLD_INVITE && Config.SHOW_WORLD_ID.get()) {
+        if (message == Messages.WORLD_INVITE) {
+            if (!Config.SHOW_WORLD_ID.get() && Config.IGNORED_WORLDS.get().isEmpty()) return;
             try {
                 String[] split = messageComponent.getSiblings().get(0).getStyle().getClickEvent().getValue().split(" ");
-                String worldID = split[split.length-1];
-                event.setMessage(messageComponent.copy().append("§8(ID: "+worldID+")"));
+                String worldId = split[split.length-1];
+                if (!Config.IGNORED_WORLDS.get().isEmpty()) {
+                    String worldName = matcher.group(2).toLowerCase();
+                    List<String> ignoredIds = new ArrayList<>(Config.IGNORED_WORLDS.get());
+                    List<String> ignoredNames = new ArrayList<>(Config.IGNORED_WORLDS.get())
+                            .stream().map(s -> s.replaceFirst(":", "").toLowerCase()).collect(Collectors.toList());
+                    if (ignoredIds.contains(worldId) || ignoredNames.stream().anyMatch(s -> s.contains(worldName))) {
+                        event.setCanceled(true);
+                        return;
+                    }
+                }
+                if (!Config.SHOW_WORLD_ID.get()) return;
+                TranslationTextComponent idComp = new TranslationTextComponent("mlmod.messages.world_id", "§8§o"+worldId);
+                idComp.setStyle(TextUtil.clickToCopyStyle("/ad "+worldId, false));
+                event.setMessage(messageComponent.copy().append(idComp));
             }
             catch (Exception e) {
                 Main.logger.error("error while reformatting world invite:", e);

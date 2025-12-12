@@ -90,44 +90,41 @@ public class ChatListener {
 
             case "/mlmodplayerinteract":
                 event.setCanceled(true);
-                if (split.length > 1) {
-                    String[] spl = message.replaceFirst("/mlmodplayerinteract ", "").split(":::");
-                    String player = spl[0];
-                    String msg = spl.length > 1 ? spl[1] : "";
-                    String chat = spl.length > 2 ? spl[2] : "/m " + player + " ";
-                    TranslationTextComponent menu = new TranslationTextComponent("mlmod.messages.chat_player_interact", "§7§o"+player);
-                    Style write = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, chat));
-                    Style copy = TextUtil.clickToCopyStyle(msg, true);
-                    Style report = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/report " + player));
-                    Style block = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore " + player));
-                    Style find = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player));
-                    Style who = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/who " + player));
-                    menu.append("\n").append(new TranslationTextComponent("mlmod.messages.reply").setStyle(write)).append(" ")
-                            .append(new TranslationTextComponent("mlmod.messages.copy_message").setStyle(copy)).append(" ")
-                            .append(new TranslationTextComponent("mlmod.messages.report").setStyle(report)).append(" ")
-                            .append(new TranslationTextComponent("mlmod.messages.block").setStyle(block)).append(" ")
-                            .append(new TranslationTextComponent("mlmod.messages.find_messages").setStyle(find)).append(" ")
-                            .append(new TranslationTextComponent("mlmod.messages.find_who").setStyle(who));
-                    ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(menu));
-                }
+                if (split.length < 2) return;
+                String[] msgSplit = message.replaceFirst("/mlmodplayerinteract ", "").split("§§");
+                String player = msgSplit[0];
+                String msg = msgSplit.length > 1 ? msgSplit[1] : "";
+                String chat = msgSplit.length > 2 ? msgSplit[2] : "/m " + player + " ";
+                StringTextComponent playerComp = new StringTextComponent("§7§o"+player+" §a⧉");
+                playerComp.setStyle(TextUtil.clickToCopyStyle(player, false));
+                TranslationTextComponent menu = new TranslationTextComponent("mlmod.messages.chat_player_interact", playerComp);
+                Style write = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, chat));
+                Style copy = TextUtil.clickToCopyStyle(msg, true);
+                Style report = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/report " + player));
+                Style block = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore " + player));
+                Style find = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player));
+                Style who = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/who " + player));
+                menu.append("\n").append(new TranslationTextComponent("mlmod.messages.reply").setStyle(write)).append(" ")
+                        .append(new TranslationTextComponent("mlmod.messages.copy_message").setStyle(copy)).append(" ")
+                        .append(new TranslationTextComponent("mlmod.messages.report").setStyle(report)).append(" ")
+                        .append(new TranslationTextComponent("mlmod.messages.block").setStyle(block)).append(" ")
+                        .append(new TranslationTextComponent("mlmod.messages.find_messages").setStyle(find)).append(" ")
+                        .append(new TranslationTextComponent("mlmod.messages.find_who").setStyle(who));
+                ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(menu));
                 break;
 
             case "/mlignore":
                 event.setCanceled(true);
                 if (split.length < 2) return;
-                String player = split[1];
-                List<String> players = new ArrayList<>(Config.IGNORED_PLAYERS.get());
-                Style add_on_mineland = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ignore add " + player + " "));
-                Style remove_on_mineland = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ignore remove " + player + " "));
-                if (!players.contains(player)) {
-                    players.add(player);
-                    ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(new TranslationTextComponent("mlmod.messages.ignore.player_added", player).append(". ").append(
-                            new TranslationTextComponent("mlmod.messages.ignore.add_on_mineland", new TranslationTextComponent("mlmod.mineland"))).withStyle(add_on_mineland)));
-                } else {
-                    players.remove(player);
-                    ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(new TranslationTextComponent("mlmod.messages.ignore.player_removed", player).append(". ").append(
-                            new TranslationTextComponent("mlmod.messages.ignore.remove_on_mineland", new TranslationTextComponent("mlmod.mineland"))).withStyle(remove_on_mineland)));
-                }
+                String ignorePlayer = split[1].toLowerCase();
+                List<String> players = new ArrayList<>(Config.IGNORED_PLAYERS.get()).stream().map(String::toLowerCase).collect(Collectors.toList());
+                boolean containsPlayer = players.contains(ignorePlayer);
+                String ignoreAction = (containsPlayer ? "/ignore remove " : "/ignore add ") + ignorePlayer + " ";
+                String ignoreMessage = containsPlayer ? "mlmod.messages.ignore.player_removed" : "mlmod.messages.ignore.player_added";
+                Style ignoreStyle = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ignoreAction));
+                if (!containsPlayer) players.add(ignorePlayer);
+                else players.remove(ignorePlayer);
+                ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(new TranslationTextComponent(ignoreMessage, ignorePlayer).withStyle(ignoreStyle)));
                 Config.IGNORED_PLAYERS.set(players);
                 Config.spec.save();
                 messageManager.updateIgnoredPlayers();
@@ -163,6 +160,7 @@ public class ChatListener {
                         ItemEditor.setLore(item, Arrays.asList(new TranslationTextComponent(varDesc).getString().split("\n")));
                     mc.player.addItem(item);
                     mc.setScreen(new InventoryScreen(mc.player));
+                    mc.gui.setOverlayMessage(new TranslationTextComponent("mlmod.messages.var.var_given"), false);
                 }
                 break;
 
@@ -193,14 +191,14 @@ public class ChatListener {
                 break;
 
             case "/ignorelist":
-                List<? extends String> ignoredPlayers = Config.IGNORED_PLAYERS.get();
+                List<String> ignoredPlayers = new ArrayList<>(Config.IGNORED_PLAYERS.get());
                 StringTextComponent ignoreComponent = new StringTextComponent(MOD_PREFIX);
                 ignoreComponent.append(new TranslationTextComponent("mlmod.messages.ignorelist.ignore_list", ignoredPlayers.size()));
                 ignoreComponent.append("\n");
-                for (String pl:ignoredPlayers) {
-                    ignoreComponent.append("§8- §7").append(new StringTextComponent(pl)
+                for (String ignoredPlayer : ignoredPlayers) {
+                    ignoreComponent.append("§8- §7").append(new StringTextComponent(ignoredPlayer)
                             .setStyle(TextUtil.newStyle()
-                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore "+pl))
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore "+ignoredPlayer))
                                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.ignorelist.click_to_remove")))));
                     ignoreComponent.append("\n");
                 }
@@ -461,21 +459,23 @@ public class ChatListener {
                 event.setCanceled(true);
                 Config.MESSAGE_COLLECTOR.set(!Config.MESSAGE_COLLECTOR.get());
                 Config.spec.save();
-                ModUtils.sendMessage(new TranslationTextComponent("mlmod.success"));
+                ModUtils.sendSuccess();
                 break;
             case "/mlmodshowmessageads":
                 event.setCanceled(true);
                 if (split.length < 2) return;
-                StringTextComponent component = new StringTextComponent(MOD_PREFIX);
-                component.append(new TranslationTextComponent("mlmod.messages.world_list"));
-                component.append("\n");
-                for (String c:message.replaceFirst("/mlmodshowmessageads ", "").split(",")) {
-                    StringTextComponent ad = new StringTextComponent("§8- §7"+c);
+                StringTextComponent adsComponent = new StringTextComponent(MOD_PREFIX);
+                adsComponent.append(new TranslationTextComponent("mlmod.messages.world_list"));
+                adsComponent.append("\n");
+                for (String adCmd:message.replaceFirst("/mlmodshowmessageads ", "").split(",")) {
+                    StringTextComponent ad = new StringTextComponent("§8- §7"+adCmd);
+                    ad.setStyle(TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, adCmd))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.world_list.join"))));
+                    ad.append(new StringTextComponent(" §a⧉").setStyle(TextUtil.clickToCopyStyle(adCmd, false)));
                     ad.append("\n");
-                    ad.setStyle(TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, c)));
-                    component.append(ad);
+                    adsComponent.append(ad);
                 }
-                ModUtils.sendMessage(component);
+                ModUtils.sendMessage(adsComponent);
                 break;
             default:
                 break;

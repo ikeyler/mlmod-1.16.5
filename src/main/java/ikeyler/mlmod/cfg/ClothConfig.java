@@ -115,6 +115,13 @@ public class ClothConfig {
 
         // creative
         TextListEntry creative_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.creative.tooltip")).build();
+        List<String> ignoredWorlds = new ArrayList<>(Config.IGNORED_WORLDS.get());
+        StringListListEntry ignored_worlds = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.ignored_worlds"),
+                        ignoredWorlds)
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.ignored_worlds.tooltip"))
+                .setDefaultValue(Collections.emptyList())
+                .setSaveConsumer(Config.IGNORED_WORLDS::set)
+                .build();
         BooleanListEntry world_invite = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.world_invite"), Config.WORLD_INVITE.get())
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.WORLD_INVITE::set)
@@ -146,6 +153,10 @@ public class ClothConfig {
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.dev_night_mode_time.tooltip"))
                 .setDefaultValue(18000)
                 .setSaveConsumer(Config.DEV_NIGHT_MODE_TIME::set)
+                .build();
+        BooleanListEntry show_message_ads = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.show_message_ads"), Config.SHOW_MESSAGE_ADS.get())
+                .setDefaultValue(true)
+                .setSaveConsumer(Config.SHOW_MESSAGE_ADS::set)
                 .build();
 
         // patterns
@@ -222,8 +233,8 @@ public class ClothConfig {
                 .addEntry(new_video).addEntry(punishment_broadcast).addEntry(donation).addEntry(player_voted)
                 .addEntry(stream).addEntry(new_ask);
 
-        creative.addEntry(creative_description).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
-                .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode).addEntry(dev_night_mode_time);
+        creative.addEntry(creative_description).addEntry(ignored_worlds).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
+                .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode).addEntry(dev_night_mode_time).addEntry(show_message_ads);
 
         patterns.addEntry(patterns_description).addEntry(welcome_pattern).addEntry(dev_mode_join_pattern)
                 .addEntry(reward_storage_pattern).addEntry(unanswered_asks_pattern)

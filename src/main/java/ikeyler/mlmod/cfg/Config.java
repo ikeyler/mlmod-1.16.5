@@ -33,6 +33,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> NEW_ASK;
 
     // creative
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> IGNORED_WORLDS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> WORLD_INVITE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_MODE_JOIN;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SHOW_WORLD_ID;
@@ -40,6 +41,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> SOUND_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_NIGHT_MODE;
     public static final ForgeConfigSpec.ConfigValue<Integer> DEV_NIGHT_MODE_TIME;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> SHOW_MESSAGE_ADS;
 
     // message patterns
     public static final ForgeConfigSpec.ConfigValue<String> WELCOME_PATTERN;
@@ -78,6 +80,7 @@ public class Config {
         builder.push("cfg");
 
         IGNORED_PLAYERS = builder.defineList("ignored_players", Collections.emptyList(), o->o instanceof String);
+        IGNORED_WORLDS = builder.defineList("ignored_worlds", Collections.emptyList(), o->o instanceof String);
         CHAT_PLAYER_INTERACT = builder.define("chat_player_interact", false);
         ADS = builder.define("ads", true);
         PM_NOTIFICATION = builder.define("pm_notification", false);
@@ -89,6 +92,7 @@ public class Config {
         SOUND_COMMAND = builder.define("sound_command", true);
         DEV_NIGHT_MODE = builder.define("dev_night_mode", false);
         DEV_NIGHT_MODE_TIME = builder.define("dev_night_mode_time", 18000);
+        SHOW_MESSAGE_ADS = builder.define("show_message_ads", true);
 
         WELCOME_TO_MINELAND = builder.define("welcome_to_mineland", true);
         DEV_MODE_JOIN = builder.define("dev_mode_join", true);

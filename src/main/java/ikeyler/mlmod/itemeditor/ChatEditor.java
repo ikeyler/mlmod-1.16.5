@@ -29,7 +29,7 @@ public class ChatEditor {
     }
 
     public void printChatEditor() {
-        if (item.equals(Items.AIR.getDefaultInstance())) {
+        if (item.getItem() == Items.AIR) {
             ModUtils.sendMessage(new TranslationTextComponent("mlmod.messages.itemeditor.empty_hand"));
             return;
         }
