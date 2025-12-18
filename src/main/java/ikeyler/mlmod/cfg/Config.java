@@ -1,6 +1,5 @@
 package ikeyler.mlmod.cfg;
 
-import ikeyler.mlmod.messages.Messages;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -12,6 +11,8 @@ public class Config {
     public static final ForgeConfigSpec spec;
 
     // general
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DETECT_MINELAND;
+    public static final ForgeConfigSpec.ConfigValue<String> MINELAND_IPS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> IGNORED_PLAYERS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> CHAT_PLAYER_INTERACT;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ADS;
@@ -42,20 +43,6 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEV_NIGHT_MODE;
     public static final ForgeConfigSpec.ConfigValue<Integer> DEV_NIGHT_MODE_TIME;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SHOW_MESSAGE_ADS;
-
-    // message patterns
-    public static final ForgeConfigSpec.ConfigValue<String> WELCOME_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> DEV_MODE_JOIN_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> REWARD_STORAGE_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> UNANSWERED_ASKS_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> UNREAD_MAIL_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> WORLD_INVITE_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> NEW_VIDEO_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> PUNISHMENT_BROADCAST_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> DONATION_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> PLAYER_VOTED_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> STREAM_PATTERN;
-    public static final ForgeConfigSpec.ConfigValue<String> NEW_ASK_PATTERN;
 
     // chat formatting
     public static final ForgeConfigSpec.ConfigValue<Boolean> CHAT_FORMATTING;
@@ -107,24 +94,14 @@ public class Config {
         STREAM = builder.define("stream", true);
         NEW_ASK = builder.define("new_ask", true);
 
-        // patterns
-        REWARD_STORAGE_PATTERN = builder.define("reward_storage_pattern", Messages.REWARD_STORAGE.getTemplate());
-        WELCOME_PATTERN = builder.define("welcome_pattern", Messages.WELCOME_TO_MINELAND.getTemplate());
-        DEV_MODE_JOIN_PATTERN = builder.define("dev_mode_join_pattern", Messages.DEV_MODE_JOIN.getTemplate());
-        UNANSWERED_ASKS_PATTERN = builder.define("unanswered_asks_pattern", Messages.UNANSWERED_ASKS.getTemplate());
-        UNREAD_MAIL_PATTERN = builder.define("unread_mail_pattern", Messages.UNREAD_MAIL.getTemplate());
-        WORLD_INVITE_PATTERN = builder.define("world_invite_pattern", Messages.WORLD_INVITE.getTemplate());
-        NEW_VIDEO_PATTERN = builder.define("new_video_pattern", Messages.NEW_VIDEO.getTemplate());
-        PUNISHMENT_BROADCAST_PATTERN = builder.define("punishment_broadcast_pattern", Messages.PUNISHMENT_BROADCAST.getTemplate());
-        DONATION_PATTERN = builder.define("donation_pattern", Messages.DONATION.getTemplate());
-        PLAYER_VOTED_PATTERN = builder.define("player_voted_pattern", Messages.PLAYER_VOTED.getTemplate());
-        STREAM_PATTERN = builder.define("stream_pattern", Messages.STREAM.getTemplate());
-        NEW_ASK_PATTERN = builder.define("new_ask_pattern", Messages.NEW_ASK.getTemplate());
-
         // chat formatting
         CHAT_FORMATTING = builder.define("chat_formatting", false);
         FORMATTING_CC = builder.define("formatting_cc", "&3CC &8|");
         FORMATTING_DC = builder.define("formatting_dc", "&2DC &8|");
+
+        // misc
+        DETECT_MINELAND = builder.define("detect_mineland", false);
+        MINELAND_IPS = builder.define("mineland_ips", "mineland.net, play-ml.ru");
 
         builder.pop();
         spec = builder.build();

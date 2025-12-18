@@ -21,13 +21,24 @@ public class ClothConfig {
                 .setTitle(new TranslationTextComponent("mlmod.config"));
         ConfigCategory general = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.general"));
         ConfigCategory general_messages = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.messages"));
-        ConfigCategory patterns = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.patterns"));
         ConfigCategory creative = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.creative"));
         ConfigCategory chat_formatting = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.chat_formatting"));
+        ConfigCategory misc = builder.getOrCreateCategory(new TranslationTextComponent("mlmod.config.category.misc"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
+        builder.transparentBackground();
 
         // general
         TextListEntry general_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.general.tooltip")).build();
+        BooleanListEntry detect_mineland = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.detect_mineland"), Config.DETECT_MINELAND.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.detect_mineland.tooltip"))
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.DETECT_MINELAND::set)
+                .build();
+        StringListEntry mineland_ips = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.mineland_ips"), Config.MINELAND_IPS.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.mineland_ips.tooltip"))
+                .setDefaultValue("mineland.net, play-ml.ru")
+                .setSaveConsumer(Config.MINELAND_IPS::set)
+                .build();
         List<String> ignoredPlayers = new ArrayList<>(Config.IGNORED_PLAYERS.get());
         StringListListEntry ignored_players = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.ignored_players"),
                 ignoredPlayers)
@@ -159,57 +170,6 @@ public class ClothConfig {
                 .setSaveConsumer(Config.SHOW_MESSAGE_ADS::set)
                 .build();
 
-        // patterns
-        TextListEntry patterns_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.patterns.tooltip")).build();
-        StringListEntry reward_storage_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.reward_storage"), Config.REWARD_STORAGE_PATTERN.get())
-                .setDefaultValue(Messages.REWARD_STORAGE.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.REWARD_STORAGE_PATTERN.set(value); Messages.REWARD_STORAGE.setNewTemplate(value);})
-                .build();
-        StringListEntry welcome_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.welcome_to_mineland"), Config.WELCOME_PATTERN.get())
-                .setDefaultValue(Messages.WELCOME_TO_MINELAND.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.WELCOME_PATTERN.set(value); Messages.WELCOME_TO_MINELAND.setNewTemplate(value);})
-                .build();
-        StringListEntry dev_mode_join_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.dev_mode_join"), Config.DEV_MODE_JOIN_PATTERN.get())
-                .setDefaultValue(Messages.DEV_MODE_JOIN.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.DEV_MODE_JOIN_PATTERN.set(value); Messages.DEV_MODE_JOIN.setNewTemplate(value);})
-                .build();
-        StringListEntry unanswered_asks_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.unanswered_asks"), Config.UNANSWERED_ASKS_PATTERN.get())
-                .setDefaultValue(Messages.UNANSWERED_ASKS.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.UNANSWERED_ASKS_PATTERN.set(value); Messages.UNANSWERED_ASKS.setNewTemplate(value);})
-                .build();
-        StringListEntry unread_mail_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.unread_mail"), Config.UNREAD_MAIL_PATTERN.get())
-                .setDefaultValue(Messages.UNREAD_MAIL.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.UNREAD_MAIL_PATTERN.set(value); Messages.UNREAD_MAIL.setNewTemplate(value);})
-                .build();
-        StringListEntry world_invite_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.world_invite"), Config.WORLD_INVITE_PATTERN.get())
-                .setDefaultValue(Messages.WORLD_INVITE.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.WORLD_INVITE_PATTERN.set(value); Messages.WORLD_INVITE.setNewTemplate(value);})
-                .build();
-        StringListEntry new_video_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.new_video"), Config.NEW_VIDEO_PATTERN.get())
-                .setDefaultValue(Messages.NEW_VIDEO.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.NEW_VIDEO_PATTERN.set(value); Messages.NEW_VIDEO.setNewTemplate(value);})
-                .build();
-        StringListEntry punishment_broadcast_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.punishment_broadcast"), Config.PUNISHMENT_BROADCAST_PATTERN.get())
-                .setDefaultValue(Messages.PUNISHMENT_BROADCAST.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.PUNISHMENT_BROADCAST_PATTERN.set(value); Messages.PUNISHMENT_BROADCAST.setNewTemplate(value);})
-                .build();
-        StringListEntry donation_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.donation"), Config.DONATION_PATTERN.get())
-                .setDefaultValue(Messages.DONATION.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.DONATION_PATTERN.set(value); Messages.DONATION.setNewTemplate(value);})
-                .build();
-        StringListEntry player_voted_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.player_voted"), Config.PLAYER_VOTED_PATTERN.get())
-                .setDefaultValue(Messages.PLAYER_VOTED.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.PLAYER_VOTED_PATTERN.set(value); Messages.PLAYER_VOTED.setNewTemplate(value);})
-                .build();
-        StringListEntry stream_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.stream"), Config.STREAM_PATTERN.get())
-                .setDefaultValue(Messages.STREAM.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.STREAM_PATTERN.set(value); Messages.STREAM.setNewTemplate(value);})
-                .build();
-        StringListEntry new_ask_pattern = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.new_ask"), Config.NEW_ASK_PATTERN.get())
-                .setDefaultValue(Messages.NEW_ASK.getFixedTemplate())
-                .setSaveConsumer(value -> {Config.NEW_ASK_PATTERN.set(value); Messages.NEW_ASK.setNewTemplate(value);})
-                .build();
-
         // formatting
         BooleanListEntry formatting = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.chat_formatting"), Config.CHAT_FORMATTING.get())
                 .setDefaultValue(false)
@@ -226,6 +186,9 @@ public class ClothConfig {
                 .setSaveConsumer(Config.FORMATTING_DC::set)
                 .build();
 
+        // misc
+        misc.addEntry(detect_mineland).addEntry(mineland_ips);
+
         general.addEntry(general_description).addEntry(ignored_players).addEntry(chat_player_interact).addEntry(ads)
                 .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate).addEntry(excl_mark_to_chat);
 
@@ -236,17 +199,11 @@ public class ClothConfig {
         creative.addEntry(creative_description).addEntry(ignored_worlds).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
                 .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode).addEntry(dev_night_mode_time).addEntry(show_message_ads);
 
-        patterns.addEntry(patterns_description).addEntry(welcome_pattern).addEntry(dev_mode_join_pattern)
-                .addEntry(reward_storage_pattern).addEntry(unanswered_asks_pattern)
-                .addEntry(unread_mail_pattern).addEntry(world_invite_pattern)
-                .addEntry(new_video_pattern).addEntry(punishment_broadcast_pattern).addEntry(donation_pattern)
-                .addEntry(player_voted_pattern).addEntry(stream_pattern).addEntry(new_ask_pattern);
-
         chat_formatting.addEntry(formatting).addEntry(formatting_cc).addEntry(formatting_dc);
         builder.setSavingRunnable(() -> {
             Config.spec.save();
+            messageManager.update();
             Messages.updateMessages();
-            messageManager.updateIgnoredPlayers();
         });
         return builder.build();
     }

@@ -26,14 +26,15 @@ public class Manager {
     private final List<Message> messageList = new ArrayList<>();
     private final Minecraft mc = Minecraft.getInstance();
     private final Pattern adPattern = Pattern.compile("/?\\b(ad|ад|id|айди|join)\\s+(\\S+)");
-    private String you = "you";
-    private final String translatePrefix = "[Перевести]";
-    private List<String> ignoredPlayers = new ArrayList<>();
-    private final List<Message> ccDisabledMessages = Arrays.asList(
-            Messages.CC_DISABLED, Messages.CC_DISABLED2, Messages.CC_DISABLED3,
-            Messages.CC_DISABLED4, Messages.CC_DISABLED5
-    );
-    private boolean init;
+    private String you;
+    private final List<String> translatePrefix = Arrays.asList("[Перевести]", "[Translate]");
+    private List<String> ignoredPlayers;
+
+    public void update() {
+        you = new TranslationTextComponent("mlmod.you").getString();
+        updateIgnoredPlayers();
+    }
+
     public void updateIgnoredPlayers() {
         ignoredPlayers = Config.IGNORED_PLAYERS.get().stream().map(String::toLowerCase).collect(Collectors.toList());
     }
@@ -44,25 +45,10 @@ public class Manager {
         return messageList.stream()
                 .filter(msg -> msg.matches(message)).findFirst().orElse(null);
     }
+
     public void processMessages(Message message, ClientChatReceivedEvent event) {
-        if (!init && (init=true)) {
-            you = new TranslationTextComponent("mlmod.you").getString();
-            updateIgnoredPlayers();
-        }
         if (message == null) return;
-        if (!message.isActive()) {
-            event.setCanceled(true);
-            return;
-        }
-        if (!Config.ADS.get() && Messages.AD_MESSAGES.contains(message)) {
-            event.setCanceled(true);
-            return;
-        }
-        if (ccDisabledMessages.contains(message)) {
-            if (message == Messages.CC_DISABLED5) {
-                event.setMessage(new TranslationTextComponent("mlmod.messages.use_excl_mark_to_cc"));
-                return;
-            }
+        if (!message.isActive() || (!Config.ADS.get() && Messages.AD_MESSAGES.contains(message))) {
             event.setCanceled(true);
             return;
         }
@@ -94,9 +80,9 @@ public class Manager {
         if (message == Messages.CREATIVE_CHAT || message == Messages.DONATE_CHAT) {
             boolean hideMessage = false;
             boolean setMessage = false;
-            String[] split = matcher.group(1).split(" ");
+            String[] split = matcher.group(2).split(" ");
             String player = split[split.length-1];
-            String msg = trimMessage(matcher.group(2));
+            String msg = trimMessage(matcher.group(3));
             String reply = message == Messages.CREATIVE_CHAT ? "/cc "+player+", " : "/dc "+player+", ";
             MessageType type = message == Messages.CREATIVE_CHAT ? MessageType.CREATIVE_CHAT : MessageType.DONATE_CHAT;
             if (isPlayerIgnored(player)) {
@@ -106,7 +92,7 @@ public class Manager {
             if (hideMessage) return;
 
             List<ITextComponent> siblingList = messageComponent.getSiblings();
-            if (Config.HIDE_TRANSLATE.get() && siblingList.get(siblingList.size()-1).getString().equalsIgnoreCase(translatePrefix)) {
+            if (Config.HIDE_TRANSLATE.get() && translatePrefix.contains(siblingList.get(siblingList.size()-1).getString())) {
                 messageComponent = new StringTextComponent("");
                 siblingList.subList(0, siblingList.size()-1).forEach(messageComponent::append);
                 setMessage = true;
@@ -157,7 +143,7 @@ public class Manager {
         if (message == Messages.PM || message == Messages.PM_REPLY) {
             boolean hideMessage = false;
             String player = message == Messages.PM ? matcher.group(1) : you;
-            String msg = trimMessage(matcher.group(2));
+            String msg = trimMessage(matcher.group(3));
             MessageType type = message == Messages.PM ? MessageType.PRIVATE_MESSAGE : MessageType.PM_REPLY;
             String data = message == Messages.PM ? msg : matcher.group(1)+" -> "+msg;
             if (isPlayerIgnored(player)) {
@@ -206,7 +192,9 @@ public class Manager {
         }
     }
     private String trimMessage(String msg) {
-        return StringUtils.removeEnd(msg, " "+translatePrefix).trim();
+        return translatePrefix.stream().filter(msg::endsWith).findFirst()
+                .map(p -> StringUtils.removeEnd(msg, p).trim())
+                .orElse(msg);
     }
     private boolean isPlayerIgnored(String player) {
         return ignoredPlayers.contains(player.toLowerCase()) &&

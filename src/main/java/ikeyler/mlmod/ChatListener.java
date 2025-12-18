@@ -5,7 +5,6 @@ import ikeyler.mlmod.cfg.Config;
 import ikeyler.mlmod.itemeditor.ChatEditor;
 import ikeyler.mlmod.itemeditor.ItemEditor;
 import ikeyler.mlmod.messages.MessageType;
-import ikeyler.mlmod.messages.Messages;
 import ikeyler.mlmod.util.ItemUtil;
 import ikeyler.mlmod.util.ModUtils;
 import ikeyler.mlmod.util.SoundUtil;
@@ -42,15 +41,13 @@ import static ikeyler.mlmod.util.ModUtils.MOD_PREFIX;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ChatListener {
     private final Minecraft mc = Minecraft.getInstance();
-    private boolean messagesUpdated = false;
     private final List<String> commands = new ArrayList<>(
             Arrays.asList("/mlc", "/item", "/var", "/text", "/num", "/msgs", "/ignorelist", "/head", "/nightmode", "/vars", "/varsave"));
 
     @SubscribeEvent
     public void onChatReceivedEvent(ClientChatReceivedEvent event) {
-        if (!messagesUpdated && (messagesUpdated=true)) {
-            Messages.updateMessages();
-        }
+        if (Config.DETECT_MINELAND.get() && !ModUtils.isOnMineland())
+            return;
         messageManager.processMessages(messageManager.getMessage(event.getMessage().getString()), event);
     }
 
@@ -65,6 +62,7 @@ public class ChatListener {
         }
 
         if (message.startsWith("!") && Config.EXCL_MARK_TO_CHAT.get() != Config.CHAT_MODE.OFF) {
+            if (Config.DETECT_MINELAND.get() && !ModUtils.isOnMineland()) return;
             String newMessage = message.replaceFirst("!", "").trim();
             if (newMessage.isEmpty()) return;
             event.setCanceled(true);
@@ -100,9 +98,9 @@ public class ChatListener {
                 TranslationTextComponent menu = new TranslationTextComponent("mlmod.messages.chat_player_interact", playerComp);
                 Style write = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, chat));
                 Style copy = TextUtil.clickToCopyStyle(msg, true);
-                Style report = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/report " + player));
+                Style report = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + player));
                 Style block = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore " + player));
-                Style find = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player));
+                Style find = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player + " "));
                 Style who = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/who " + player));
                 menu.append("\n").append(new TranslationTextComponent("mlmod.messages.reply").setStyle(write)).append(" ")
                         .append(new TranslationTextComponent("mlmod.messages.copy_message").setStyle(copy)).append(" ")

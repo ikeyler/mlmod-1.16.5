@@ -2,10 +2,12 @@ package ikeyler.mlmod.util;
 
 import ikeyler.mlmod.cfg.Config;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class ModUtils {
     private static final Minecraft mc = Minecraft.getInstance();
@@ -15,6 +17,11 @@ public class ModUtils {
     public static final double GAME_GAMMA_SETTING = mc.options.gamma;
     public static LocalDateTime LATEST_WORLD_JOIN = LocalDateTime.now();
 
+    public static boolean isOnMineland() {
+        ServerData data = mc.getCurrentServer();
+        return data != null && Arrays.stream(Config.MINELAND_IPS.get().split(","))
+                .anyMatch(ip -> data.ip.contains(ip.trim()));
+    }
     public static void enableNightDevMode() {
         if (Config.DEV_NIGHT_MODE.get() && mc.player.isCreative()) {
             NIGHT_DEV_MODE = true;

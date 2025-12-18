@@ -8,14 +8,17 @@ import ikeyler.mlmod.messages.Messages;
 import ikeyler.mlmod.variables.VarCollector;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod("mlmod")
+@Mod.EventBusSubscriber(modid="mlmod", bus=Mod.EventBusSubscriber.Bus.MOD)
 public class Main {
     public static final Logger logger = LogManager.getLogger();
     public static final Manager messageManager = new Manager();
@@ -27,9 +30,14 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new PacketHandler());
         MinecraftForge.EVENT_BUS.register(new ChatListener());
         MinecraftForge.EVENT_BUS.register(new Keybinds());
-        messageManager.addMessages(Messages.MESSAGES);
-        messageManager.addMessages(Messages.AD_MESSAGES);
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (client, parent) -> ClothConfig.buildConfigScreen(Minecraft.getInstance().screen));
         Keybinds.register();
+    }
+    @SubscribeEvent
+    public static void onLoadComplete(FMLLoadCompleteEvent event) {
+        messageManager.addMessages(Messages.MESSAGES);
+        messageManager.addMessages(Messages.AD_MESSAGES);
+        messageManager.update();
+        Messages.updateMessages();
     }
 }

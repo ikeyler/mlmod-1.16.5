@@ -27,9 +27,10 @@ public class PacketHandler {
             pipeline.addBefore("packet_handler", packetName, new ChannelInboundHandlerAdapter() {
                 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                     if (msg instanceof SUpdateTimePacket && ModUtils.NIGHT_DEV_MODE) {
-                        if (mc.level != null)
+                        if (mc.level != null) {
                             mc.level.setDayTime(Config.DEV_NIGHT_MODE_TIME.get());
-                        return;
+                            return;
+                        }
                     }
                     super.channelRead(ctx, msg);
                 }
@@ -43,7 +44,9 @@ public class PacketHandler {
         if (manager != null) {
             ChannelPipeline pipeline = manager.channel().pipeline();
             if (pipeline.get(packetName) != null) {
-                pipeline.remove(packetName);
+                try {
+                    pipeline.remove(packetName);
+                } catch (Exception e) { Main.logger.error("could not remove packet handler:", e); }
             }
         }
     }

@@ -17,9 +17,10 @@ license = "${mod_license}"
 # The modid of the mod
 modId = "mlmod" #mandatory
 # The version number of the mod
-version = "v1.2b" #mandatory
+version = "v1.4" #mandatory
 # A display name for the mod
 displayName = "MLMod" #mandatory
+displayURL = "https://github.com/ikeyler/mlmod-1.16.5"
 # A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
