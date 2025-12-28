@@ -12,7 +12,6 @@ import ikeyler.mlmod.util.TextUtil;
 import ikeyler.mlmod.variables.Variable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -24,6 +23,7 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static ikeyler.mlmod.Main.*;
 import static ikeyler.mlmod.util.ModUtils.MOD_PREFIX;
+import static ikeyler.mlmod.util.ModUtils.VAR_SEPARATOR;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class ChatListener {
@@ -59,6 +60,28 @@ public class ChatListener {
         if (commands.contains(start.toLowerCase())) {
             event.setCanceled(true);
             mc.gui.getChat().addRecentChat(message);
+        }
+
+        if (message.startsWith("/") && !Config.COMMAND_ALIASES.get().isEmpty()) {
+            String command = start.replaceFirst("/", "");
+            String args = message.split(" ", 2).length > 1 ? message.split(" ", 2)[1] : "";
+            if (command.isEmpty()) return;
+            for (String entry:Config.COMMAND_ALIASES.get()) {
+                String[] spl = entry.split(":", 2);
+                if (spl.length < 2) continue;
+                if (command.equalsIgnoreCase(spl[0].trim())) {
+                    event.setCanceled(true);
+                    String cmd = spl[1].trim();
+                    String output = "/"+cmd+" "+args;
+                    if (commands.contains("/"+cmd.toLowerCase()))
+                        MinecraftForge.EVENT_BUS.post(new ClientChatEvent(output));
+                    else {
+                        mc.player.chat(output);
+                        mc.gui.getChat().addRecentChat(message);
+                    }
+                    break;
+                }
+            }
         }
 
         if (message.startsWith("!") && Config.EXCL_MARK_TO_CHAT.get() != Config.CHAT_MODE.OFF) {
@@ -91,23 +114,38 @@ public class ChatListener {
                 if (split.length < 2) return;
                 String[] msgSplit = message.replaceFirst("/mlmodplayerinteract ", "").split("§§");
                 String player = msgSplit[0];
-                String msg = msgSplit.length > 1 ? msgSplit[1] : "";
-                String chat = msgSplit.length > 2 ? msgSplit[2] : "/m " + player + " ";
-                StringTextComponent playerComp = new StringTextComponent("§7§o"+player+" §a⧉");
-                playerComp.setStyle(TextUtil.clickToCopyStyle(player, false));
+                String msg = msgSplit.length > 1 ? msgSplit[1] : null;
+                String chat = msgSplit.length > 2 ? msgSplit[2] : null;
+
+                StringTextComponent playerComp = new StringTextComponent("§7§o"+player);
+                playerComp.append(new TranslationTextComponent("mlmod.copy"));
+                playerComp.setStyle(TextUtil.clickToCopyStyle(player, "name", false));
                 TranslationTextComponent menu = new TranslationTextComponent("mlmod.messages.chat_player_interact", playerComp);
-                Style write = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, chat));
-                Style copy = TextUtil.clickToCopyStyle(msg, true);
-                Style report = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + player));
-                Style block = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore " + player));
-                Style find = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player + " "));
-                Style who = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/who " + player));
-                menu.append("\n").append(new TranslationTextComponent("mlmod.messages.reply").setStyle(write)).append(" ")
-                        .append(new TranslationTextComponent("mlmod.messages.copy_message").setStyle(copy)).append(" ")
-                        .append(new TranslationTextComponent("mlmod.messages.report").setStyle(report)).append(" ")
-                        .append(new TranslationTextComponent("mlmod.messages.block").setStyle(block)).append(" ")
-                        .append(new TranslationTextComponent("mlmod.messages.find_messages").setStyle(find)).append(" ")
-                        .append(new TranslationTextComponent("mlmod.messages.find_who").setStyle(who));
+
+                menu.append("\n");
+                if (msg != null && chat != null)
+                    menu.append(new TranslationTextComponent("mlmod.messages.reply").setStyle(
+                            TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, chat))
+                    )).append(" ");
+                if (msg != null)
+                    menu.append(new TranslationTextComponent("mlmod.messages.copy_message").setStyle(
+                            TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, msg))
+                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(msg)))
+                    )).append(" ");
+
+                menu.append(new TranslationTextComponent("mlmod.messages.report").setStyle(
+                        TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/report " + player))
+                )).append(" ");
+                menu.append(new TranslationTextComponent("mlmod.messages.block").setStyle(
+                        TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlignore " + player))
+                )).append(" ");
+                menu.append(new TranslationTextComponent("mlmod.messages.find_messages").setStyle(
+                        TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msgs find " + player + " "))
+                )).append(" ");
+                menu.append(new TranslationTextComponent("mlmod.messages.find_who").setStyle(
+                        TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/who " + player))
+                ));
+
                 ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX).append(menu));
                 break;
 
@@ -156,8 +194,9 @@ public class ChatListener {
                     item.setHoverName(new StringTextComponent(TextUtil.replaceColorCodes(name)));
                     if (varDesc != null)
                         ItemEditor.setLore(item, Arrays.asList(new TranslationTextComponent(varDesc).getString().split("\n")));
-                    mc.player.addItem(item);
-                    mc.setScreen(new InventoryScreen(mc.player));
+                    int slotId = mc.player.inventory.getFreeSlot();
+                    mc.player.inventory.setItem(slotId, item);
+                    ItemUtil.updateSlot(36+slotId, item);
                     mc.gui.setOverlayMessage(new TranslationTextComponent("mlmod.messages.var.var_given"), false);
                 }
                 break;
@@ -165,14 +204,18 @@ public class ChatListener {
             case "/msgs":
                 if (split.length == 1) {
                     int totalMessages = messageCollector.readAll().size();
+                    Style fileStyle = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "mlmodData.txt"));
                     StringTextComponent component = new StringTextComponent(MOD_PREFIX);
                     component.append(new TranslationTextComponent("mlmod.messages.collector.total", totalMessages));
-                    component.append("\n").append(new TranslationTextComponent("mlmod.messages.collector.search_guide"));
-                    Style msgsStyle = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "mlmodData.txt"));
-                    component.append("\n").append(new TranslationTextComponent("mlmod.messages.collector.info").setStyle(msgsStyle)).append("\n");
-                    String state = Config.MESSAGE_COLLECTOR.get() ? new TranslationTextComponent("mlmod.messages.collector.state_enabled").getString() : new TranslationTextComponent("mlmod.messages.collector.state_disabled").getString();
-                    msgsStyle = TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodtogglemsgcollector"));
-                    component.append(new StringTextComponent(state).setStyle(msgsStyle));
+                    component.append("\n");
+                    component.append(new TranslationTextComponent("mlmod.messages.collector.search_guide"));
+                    component.append("\n");
+                    component.append(new TranslationTextComponent("mlmod.messages.collector.info").setStyle(fileStyle));
+                    component.append("\n");
+                    String state = Config.MESSAGE_COLLECTOR.get()
+                            ? "mlmod.messages.collector.state_enabled" : "mlmod.messages.collector.state_disabled";
+                    component.append(new TranslationTextComponent(state).setStyle(
+                            TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodtogglemsgcollector"))));
                     ModUtils.sendMessage(component);
                     return;
                 }
@@ -333,7 +376,7 @@ public class ChatListener {
                         break;
                     case "nbt":
                         String nbt = itemStack.hasTag() ? itemStack.getTag().toString() : "{}";
-                        ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX+nbt).setStyle(TextUtil.clickToCopyStyle(nbt, false)));
+                        ModUtils.sendMessage(new StringTextComponent(MOD_PREFIX+nbt).setStyle(TextUtil.clickToCopyStyle(nbt, "text", false)));
                         return;
                     case "enchlist":
                         List<String> enchantments = ForgeRegistries.ENCHANTMENTS.getKeys().stream().map(ResourceLocation::getPath).collect(Collectors.toList());
@@ -395,7 +438,7 @@ public class ChatListener {
                         break;
                 }
                 ModUtils.sendBarSuccess();
-                ItemUtil.updateInventory(36+mc.player.inventory.selected, itemStack);
+                ItemUtil.updateSlot(36+mc.player.inventory.selected, itemStack);
                 break;
 
             case "/vars":
@@ -404,14 +447,15 @@ public class ChatListener {
                 varComponent.append(new TranslationTextComponent("mlmod.messages.vars.var_list", vars.size()));
                 varComponent.append("\n");
                 for (Variable variable:vars) {
-                    String stringVar = variable.getType()+"::"+variable.getName();
+                    String stringVar = variable.getType()+VAR_SEPARATOR+variable.getName()+VAR_SEPARATOR+variable.getNbt();
                     varComponent.append(new StringTextComponent("§c- §7")
                                     .setStyle(TextUtil.newStyle()
-                                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/removevar "+stringVar))
+                                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodremovevar "+stringVar))
                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.vars.click_to_remove")))))
-                            .append(new TranslationTextComponent(variable.getType().getTranslation()).append("§7: "+variable.getName())
+                            .append(new TranslationTextComponent("mlmod.var."+variable.getType().name().toLowerCase())
+                                    .append("§7: "+variable.getFixedName())
                                     .setStyle(TextUtil.newStyle()
-                                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/getvar "+stringVar))
+                                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodgetvar "+stringVar))
                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.vars.click_to_get")))));
                     varComponent.append("\n");
                 }
@@ -430,9 +474,9 @@ public class ChatListener {
                 ModUtils.sendMessage(new TranslationTextComponent("mlmod.messages.vars.var_saved", variable.getType().name()));
                 break;
 
-            case "/removevar":
+            case "/mlmodremovevar":
                 event.setCanceled(true);
-                Variable parsedVar = Variable.fromString(message.replaceFirst("/removevar ", ""));
+                Variable parsedVar = Variable.fromString(message.replaceFirst("/mlmodremovevar ", ""));
                 if (parsedVar != null && varCollector.removeVariable(parsedVar)) {
                     ModUtils.sendMessage(new TranslationTextComponent("mlmod.messages.vars.var_removed", parsedVar.getName()));
                     return;
@@ -440,16 +484,20 @@ public class ChatListener {
                 ModUtils.sendMessage(new TranslationTextComponent("mlmod.messages.vars.var_not_removed"));
                 break;
 
-            case "/getvar":
+            case "/mlmodgetvar":
                 event.setCanceled(true);
                 if (!mc.player.isCreative()) {
                     ModUtils.sendCreativeModeNeeded();
                     return;
                 }
-                Variable parsedVar2 = Variable.fromString(message.replaceFirst("/getvar ", ""));
-                if (parsedVar2 != null) {
-                    mc.player.addItem(Variable.itemFromVariable(parsedVar2));
-                    // still finding a way to update inventory!!!
+                Variable parsedVar2 = Variable.fromString(message.replaceFirst("/mlmodgetvar ", ""));
+                ItemStack itemVar;
+                if (parsedVar2 != null && (itemVar = Variable.itemFromVariable(parsedVar2)) != null) {
+                    int slotId = mc.player.inventory.getFreeSlot();
+                    // who else would think that u should use
+                    // setItem instead of addItem?
+                    mc.player.inventory.setItem(slotId, itemVar);
+                    ItemUtil.updateSlot(36 + slotId, itemVar);
                 }
                 break;
 
@@ -469,7 +517,7 @@ public class ChatListener {
                     StringTextComponent ad = new StringTextComponent("§8- §7"+adCmd);
                     ad.setStyle(TextUtil.newStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, adCmd))
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.world_list.join"))));
-                    ad.append(new StringTextComponent(" §a⧉").setStyle(TextUtil.clickToCopyStyle(adCmd, false)));
+                    ad.append(new StringTextComponent(" §a⧉").setStyle(TextUtil.clickToCopyStyle(adCmd, "id", false)));
                     ad.append("\n");
                     adsComponent.append(ad);
                 }

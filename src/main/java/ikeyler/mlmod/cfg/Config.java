@@ -3,6 +3,8 @@ package ikeyler.mlmod.cfg;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,8 +13,6 @@ public class Config {
     public static final ForgeConfigSpec spec;
 
     // general
-    public static final ForgeConfigSpec.ConfigValue<Boolean> DETECT_MINELAND;
-    public static final ForgeConfigSpec.ConfigValue<String> MINELAND_IPS;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> IGNORED_PLAYERS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> CHAT_PLAYER_INTERACT;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ADS;
@@ -20,6 +20,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> PM_NOTIFICATION;
     public static final ForgeConfigSpec.ConfigValue<Boolean> HIDE_TRANSLATE;
     public static final ForgeConfigSpec.ConfigValue<CHAT_MODE> EXCL_MARK_TO_CHAT;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> MESSAGES_IN_ACTIONBAR;
 
     // main messages
     public static final ForgeConfigSpec.ConfigValue<Boolean> WELCOME_TO_MINELAND;
@@ -32,6 +33,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> PLAYER_VOTED;
     public static final ForgeConfigSpec.ConfigValue<Boolean> STREAM;
     public static final ForgeConfigSpec.ConfigValue<Boolean> NEW_ASK;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> LOGIN_CHECK;
 
     // creative
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> IGNORED_WORLDS;
@@ -48,6 +50,11 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Boolean> CHAT_FORMATTING;
     public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_CC;
     public static final ForgeConfigSpec.ConfigValue<String> FORMATTING_DC;
+
+    // misc
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DETECT_MINELAND;
+    public static final ForgeConfigSpec.ConfigValue<String> MINELAND_IPS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> COMMAND_ALIASES;
 
     public enum CHAT_MODE {
         DC("mlmod.config.option.excl_mark_to_chat.dc"),
@@ -73,6 +80,8 @@ public class Config {
         PM_NOTIFICATION = builder.define("pm_notification", false);
         MESSAGE_COLLECTOR = builder.define("message_collector", false);
         HIDE_TRANSLATE = builder.define("hide_translate", false);
+        MESSAGES_IN_ACTIONBAR = builder.define("messages_in_actionbar", true);
+
         SHOW_WORLD_ID = builder.define("show_world_id", true);
         EXCL_MARK_TO_CHAT = builder.defineEnum("excl_mark_to_chat", CHAT_MODE.OFF);
         PLAY_SOUND = builder.define("play_sound", false);
@@ -93,6 +102,7 @@ public class Config {
         PLAYER_VOTED = builder.define("player_voted", true);
         STREAM = builder.define("stream", true);
         NEW_ASK = builder.define("new_ask", true);
+        LOGIN_CHECK = builder.define("login_check", true);
 
         // chat formatting
         CHAT_FORMATTING = builder.define("chat_formatting", false);
@@ -102,6 +112,8 @@ public class Config {
         // misc
         DETECT_MINELAND = builder.define("detect_mineland", false);
         MINELAND_IPS = builder.define("mineland_ips", "mineland.net, play-ml.ru");
+        COMMAND_ALIASES = builder.defineList("command_aliases", new ArrayList<>(Arrays.asList("кк:креативкоины", "з:золото")),
+                o->o instanceof String);
 
         builder.pop();
         spec = builder.build();

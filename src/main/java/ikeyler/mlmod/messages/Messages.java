@@ -109,6 +109,16 @@ public class Messages {
     public static final Message PM = new Message("✉ » (\\S+) -> (тебе|you) \\| (.*?)");
     public static final Message PM_REPLY = new Message("✉ » (ты|you) -> (\\S+) \\| (.*?)");
 
+    public static final Message LOGIN_CHECK = new Message(
+            "Guard » Checking in progress, please wait\\.\\.\\. \n Do not move, everything happens automatically\\.\\s*",
+            "Guard » Enter code from the image into chat\\.\\s*If you don't see the image, you need to completely reinstall Minecraft\\."
+    );
+
+    public static final Message WORLD_MODE_CHANGE = new Message(
+            "Система » Ты вошёл в режим (игры|разработчика)\\.",
+            "System » You're now in (playing|developer) mode\\."
+    );
+
     public static final Message CC_DISABLED = new Message(
             " \\| \\[ОПОВЕЩЕНИЕ\\]",
             " \\| На Sharded отключен глобальный чат\\. Зачем\\?",
@@ -306,7 +316,7 @@ public class Messages {
     public static final List<Message> MESSAGES = new ArrayList<>(
             Arrays.asList(REWARD_STORAGE, WELCOME_TO_MINELAND, DEV_MODE_JOIN, UNREAD_MAIL, UNANSWERED_ASKS, WORLD_INVITE, NEW_VIDEO, PUNISHMENT_BROADCAST,
                     DONATION, PLAYER_VOTED, STREAM, NEW_ASK, CREATIVE_CHAT, DONATE_CHAT, PM, PM_REPLY, PARTY_CHAT,
-                    CC_DISABLED
+                    CC_DISABLED, LOGIN_CHECK, WORLD_MODE_CHANGE
             )
     );
 
@@ -340,5 +350,6 @@ public class Messages {
         PLAYER_VOTED.setActive(Config.PLAYER_VOTED.get());
         STREAM.setActive(Config.STREAM.get());
         NEW_ASK.setActive(Config.NEW_ASK.get());
+        LOGIN_CHECK.setActive(Config.LOGIN_CHECK.get());
     }
 }

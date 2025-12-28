@@ -29,6 +29,7 @@ public class Manager {
     private String you;
     private final List<String> translatePrefix = Arrays.asList("[Перевести]", "[Translate]");
     private List<String> ignoredPlayers;
+    private final List<Message> abarMessages = Arrays.asList(Messages.WORLD_MODE_CHANGE, Messages.LOGIN_CHECK);
 
     public void update() {
         you = new TranslationTextComponent("mlmod.you").getString();
@@ -50,6 +51,11 @@ public class Manager {
         if (message == null) return;
         if (!message.isActive() || (!Config.ADS.get() && Messages.AD_MESSAGES.contains(message))) {
             event.setCanceled(true);
+            return;
+        }
+        if (Config.MESSAGES_IN_ACTIONBAR.get() && abarMessages.contains(message)) {
+            event.setCanceled(true);
+            mc.gui.setOverlayMessage(event.getMessage(), false);
             return;
         }
 
@@ -123,14 +129,15 @@ public class Manager {
                     while (adMatcher.find()) {
                         String[] spl = adMatcher.group(0).split(" ");
                         String adId = spl[spl.length - 1].replace(",", "");
-                        if (!adList.contains(adId))
+                        if (!adList.contains(adId) && adId.length()>2)
                             adList.add("/ad " + adId.replace(",", ""));
                     }
                     if (!adList.isEmpty()) {
                         Style adStyle = TextUtil.newStyle().
                                 withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mlmodshowmessageads " + String.join(",", adList))).
                                 withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("mlmod.messages.show_world_ads")));
-                        StringTextComponent adComponent = new StringTextComponent(" ⬈");
+                        String adSymbol = msg.endsWith(" ") ? "⬈" : " ⬈";
+                        StringTextComponent adComponent = new StringTextComponent(adSymbol);
                         adComponent.setStyle(adStyle);
                         messageComponent.append(adComponent);
                     }
@@ -171,20 +178,22 @@ public class Manager {
             try {
                 String[] split = messageComponent.getSiblings().get(0).getStyle().getClickEvent().getValue().split(" ");
                 String worldId = split[split.length-1];
+                String worldName = matcher.group(2);
                 if (!Config.IGNORED_WORLDS.get().isEmpty()) {
-                    String worldName = matcher.group(2).toLowerCase();
                     List<String> ignoredIds = new ArrayList<>(Config.IGNORED_WORLDS.get());
                     List<String> ignoredNames = new ArrayList<>(Config.IGNORED_WORLDS.get())
                             .stream().map(s -> s.replaceFirst(":", "").toLowerCase()).collect(Collectors.toList());
-                    if (ignoredIds.contains(worldId) || ignoredNames.stream().anyMatch(s -> s.contains(worldName))) {
+                    if (ignoredIds.contains(worldId) || ignoredNames.stream().anyMatch(s -> s.contains(worldName.toLowerCase()))) {
                         event.setCanceled(true);
                         return;
                     }
                 }
                 if (!Config.SHOW_WORLD_ID.get()) return;
-                TranslationTextComponent idComp = new TranslationTextComponent("mlmod.messages.world_id", "§8§o"+worldId);
-                idComp.setStyle(TextUtil.clickToCopyStyle("/ad "+worldId, false));
-                event.setMessage(messageComponent.copy().append(idComp));
+                TranslationTextComponent info = new TranslationTextComponent("mlmod.messages.world_id", "§8§o"+worldId);
+                info.setStyle(TextUtil.clickToCopyStyle("/ad "+worldId, "id", false));
+                info.append(new TranslationTextComponent("mlmod.copy")
+                        .setStyle(TextUtil.clickToCopyStyle(worldName, "name", false)));
+                event.setMessage(messageComponent.copy().append(info));
             }
             catch (Exception e) {
                 Main.logger.error("error while reformatting world invite:", e);

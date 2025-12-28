@@ -1,6 +1,7 @@
 package ikeyler.mlmod.util;
 
 import com.mojang.authlib.GameProfile;
+import ikeyler.mlmod.Main;
 import ikeyler.mlmod.itemeditor.ItemEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -18,15 +19,14 @@ import java.util.List;
 public class ItemUtil {
 
     static Minecraft mc = Minecraft.getInstance();
-    public static void updateInventory(int slot, ItemStack item) {
-        if (mc.hasSingleplayerServer()) {
-            mc.getSingleplayerServer().getPlayerList().getPlayerByName(mc.player.getName().getString())
-                    .inventoryMenu.setItem(slot, item);
-        }
-        else {
-            try {mc.getConnection().send(new CCreativeInventoryActionPacket(slot, item));} catch (Exception ignore) {}
+    public static void updateSlot(int slot, ItemStack item) {
+        try {
+            mc.getConnection().send(new CCreativeInventoryActionPacket(slot, item));
+        } catch (Exception e) {
+            Main.logger.error("failed to send inventory packet:", e);
         }
     }
+
     public static ItemStack getPlayerHead(String playerName) {
         // todo need to get player uuid from https://api.mojang.com/users/profiles/minecraft/
         // and write it to the itemstack

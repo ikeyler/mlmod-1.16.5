@@ -35,11 +35,12 @@ public class TextUtil {
                         clickText
                 ));
     }
-    public static Style clickToCopyStyle(String copyText, boolean hover) {
+    public static Style clickToCopyStyle(String copyText, String type, boolean hover) {
+        // types: text, id, name
         return newStyle()
                 .withHoverEvent(new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
-                        hover ? new StringTextComponent(copyText) : new TranslationTextComponent("mlmod.messages.lmb_to_copy_text")
+                        hover ? new StringTextComponent(copyText) : new TranslationTextComponent("mlmod.messages.lmb_to_copy_"+type.toLowerCase())
                 ))
                 .withClickEvent(new ClickEvent(
                         ClickEvent.Action.COPY_TO_CLIPBOARD,

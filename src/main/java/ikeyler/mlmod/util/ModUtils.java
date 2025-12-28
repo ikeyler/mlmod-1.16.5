@@ -16,6 +16,7 @@ public class ModUtils {
     public static boolean NIGHT_DEV_MODE = false;
     public static final double GAME_GAMMA_SETTING = mc.options.gamma;
     public static LocalDateTime LATEST_WORLD_JOIN = LocalDateTime.now();
+    public static final String VAR_SEPARATOR = "::";
 
     public static boolean isOnMineland() {
         ServerData data = mc.getCurrentServer();

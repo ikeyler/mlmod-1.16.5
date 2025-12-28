@@ -1,95 +1,96 @@
 package ikeyler.mlmod.variables;
 
+import ikeyler.mlmod.Main;
 import ikeyler.mlmod.itemeditor.ItemEditor;
 import ikeyler.mlmod.util.ItemUtil;
 import ikeyler.mlmod.util.TextUtil;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.nbt.JsonToNBT;
 
 import java.util.Arrays;
+
+import static ikeyler.mlmod.util.ModUtils.VAR_SEPARATOR;
 
 public class Variable {
 
     private final VariableType type;
     private final String name;
-    public Variable(VariableType type, String name) {
+    private final String nbt;
+    public Variable(VariableType type, String name, String nbt) {
         this.type = type;
-        this.name = name;
+        this.name = name.replace(VAR_SEPARATOR, ":\\:");
+        this.nbt = nbt;
     }
 
     public VariableType getType() {
         return this.type;
     }
-
     public String getName() {
         return this.name;
     }
+    public String getFixedName() {
+        return this.name.replace(":\\:", VAR_SEPARATOR);
+    }
+    public String getNbt() {
+        return this.nbt;
+    }
 
     public static Variable fromString(String s) {
-        String[] split = s.split("::", 2);
-        if (!s.contains("::") || split.length < 2) return null;
+        String[] split = s.split(VAR_SEPARATOR, 3);
+        if (!s.contains(VAR_SEPARATOR) || split.length < 3) return null;
         VariableType type = Arrays.stream(VariableType.values()).filter(t -> split[0].toUpperCase().equals(t.name())).findFirst().orElse(null);
         if (type == null) return null;
-        return new Variable(type, split[1]);
+        return new Variable(type, split[1].replace(":\\:", VAR_SEPARATOR), split[2]);
     }
 
     public static Variable fromItem(ItemStack item) {
-        String itemId = item.getItem().getRegistryName().getPath();
-        VariableType type = null;
-        switch (itemId) {
-            case "book": type = VariableType.TEXT; break;
-            case "slime_ball": type = VariableType.NUMBER; break;
-            case "paper": type = VariableType.LOCATION; break;
-            case "magma_cream":
+        VariableType type = Arrays.stream(VariableType.values()).filter
+                (t -> t.getItemStack().getItem() == item.getItem()).findFirst().orElse(null);
+        if (type == null || !item.hasTag()) return null;
+
+        if (type == VariableType.VAR_UNSAVED || type == VariableType.ARRAY_CONST) {
+            if (item.sameItemStackIgnoreDurability(Items.MAGMA_CREAM.getDefaultInstance())) {
                 String itemLore = ItemEditor.getLore(item).toString();
                 type = (itemLore.contains("§dСОХРАНЕНО") || itemLore.contains("§dSAVED")) ? VariableType.VAR_SAVED : VariableType.VAR_UNSAVED;
-                break;
-            case "item_frame":
-                type = item.getHoverName().getString().contains("⎘") ? VariableType.ARRAY_CONST : VariableType.ARRAY_TEMP;
-                break;
-            case "shulker_shell": type = VariableType.COMPONENT; break;
-            case "prismarine_shard": type = VariableType.VECTOR; break;
-            default: break;
+            }
+            else type = item.getDisplayName().getString().contains("⎘") ? VariableType.ARRAY_CONST : VariableType.ARRAY_TEMP;
         }
-        if (type == null) return null;
-        return new Variable(type, TextUtil.getFormattedText(item.getHoverName()));
+        return new Variable(type, TextUtil.getFormattedText(item.getHoverName()), item.getTag().toString());
     }
 
     public static ItemStack itemFromVariable(Variable variable) {
-        ItemStack item = null;
-        switch (variable.getType()) { // ignoring these warnings
-            case TEXT: item = Items.BOOK.getDefaultInstance(); break;
-            case NUMBER: item = Items.SLIME_BALL.getDefaultInstance(); break;
-            case LOCATION: item = Items.PAPER.getDefaultInstance(); break;
-            case VAR_UNSAVED: item = ItemUtil.getDynamicVar(false); break;
-            case VAR_SAVED: item = ItemUtil.getDynamicVar(true); break;
-            case ARRAY_CONST:
-            case ARRAY_TEMP: item = Items.ITEM_FRAME.getDefaultInstance(); break;
-            case COMPONENT: item = Items.SHULKER_SHELL.getDefaultInstance(); break;
-            case VECTOR: item = Items.PRISMARINE_SHARD.getDefaultInstance(); break;
-            default: break;
+        ItemStack item = variable.getType().getItemStack();
+        try {
+            item.setTag(JsonToNBT.parseTag(variable.nbt));
+            return item;
         }
-        item.setHoverName(new StringTextComponent(variable.getName()));
-        return item;
+        catch (Exception e) {
+            Main.logger.error("failed to parse nbt:", e);
+            return null;
+        }
     }
 
     public enum VariableType {
-        TEXT("mlmod.var.text"),
-        NUMBER("mlmod.var.number"),
-        LOCATION("mlmod.var.location"),
-        VAR_UNSAVED("mlmod.var.var_unsaved"),
-        VAR_SAVED("mlmod.var.var_saved"),
-        ARRAY_CONST("mlmod.var.array_const"),
-        ARRAY_TEMP("mlmod.var.array_temp"),
-        COMPONENT("mlmod.var.component"),
-        VECTOR("mlmod.var.vector");
-        private final String translation;
-        VariableType(String translation) {
-            this.translation = translation;
+        TEXT(Items.BOOK),
+        NUMBER(Items.SLIME_BALL),
+        LOCATION(Items.PAPER),
+        VAR_UNSAVED(ItemUtil.getDynamicVar(false).getItem()),
+        VAR_SAVED(ItemUtil.getDynamicVar(true).getItem()),
+        ARRAY_CONST(Items.ITEM_FRAME),
+        ARRAY_TEMP(Items.ITEM_FRAME),
+        COMPONENT(Items.SHULKER_SHELL),
+        VECTOR(Items.PRISMARINE_SHARD),
+        GAME_VALUE(Items.APPLE),
+        PARTICLE(Items.NETHER_STAR),
+        POTION(Items.POTION);
+        private final Item item;
+        VariableType(Item item) {
+            this.item = item;
         }
-        public String getTranslation() {
-            return translation;
+        public ItemStack getItemStack() {
+            return item.getDefaultInstance();
         }
     }
 }

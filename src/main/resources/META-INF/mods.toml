@@ -17,7 +17,7 @@ license = "${mod_license}"
 # The modid of the mod
 modId = "mlmod" #mandatory
 # The version number of the mod
-version = "v1.4" #mandatory
+version = "v1.5" #mandatory
 # A display name for the mod
 displayName = "MLMod" #mandatory
 displayURL = "https://github.com/ikeyler/mlmod-1.16.5"

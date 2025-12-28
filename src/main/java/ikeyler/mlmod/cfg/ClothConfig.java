@@ -9,8 +9,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static ikeyler.mlmod.Main.messageManager;
 
@@ -29,19 +29,8 @@ public class ClothConfig {
 
         // general
         TextListEntry general_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.general.tooltip")).build();
-        BooleanListEntry detect_mineland = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.detect_mineland"), Config.DETECT_MINELAND.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.detect_mineland.tooltip"))
-                .setDefaultValue(false)
-                .setSaveConsumer(Config.DETECT_MINELAND::set)
-                .build();
-        StringListEntry mineland_ips = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.mineland_ips"), Config.MINELAND_IPS.get())
-                .setTooltip(new TranslationTextComponent("mlmod.config.option.mineland_ips.tooltip"))
-                .setDefaultValue("mineland.net, play-ml.ru")
-                .setSaveConsumer(Config.MINELAND_IPS::set)
-                .build();
-        List<String> ignoredPlayers = new ArrayList<>(Config.IGNORED_PLAYERS.get());
         StringListListEntry ignored_players = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.ignored_players"),
-                ignoredPlayers)
+                new ArrayList<>(Config.IGNORED_PLAYERS.get()))
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.ignored_players.tooltip"))
                 .setDefaultValue(Collections.emptyList())
                 .setSaveConsumer(Config.IGNORED_PLAYERS::set)
@@ -74,6 +63,11 @@ public class ClothConfig {
         EnumListEntry<Config.CHAT_MODE> excl_mark_to_chat = entryBuilder.startEnumSelector(new TranslationTextComponent("mlmod.config.option.excl_mark_to_chat"), Config.CHAT_MODE.class, Config.EXCL_MARK_TO_CHAT.get())
                 .setDefaultValue(Config.CHAT_MODE.OFF)
                 .setSaveConsumer(Config.EXCL_MARK_TO_CHAT::set)
+                .build();
+        BooleanListEntry messages_in_actionbar = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.messages_in_actionbar"), Config.MESSAGES_IN_ACTIONBAR.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.messages_in_actionbar.tooltip"))
+                .setDefaultValue(true)
+                .setSaveConsumer(Config.MESSAGES_IN_ACTIONBAR::set)
                 .build();
 
         // main messages
@@ -123,12 +117,16 @@ public class ClothConfig {
                 .setDefaultValue(true)
                 .setSaveConsumer(Config.NEW_ASK::set)
                 .build();
+        BooleanListEntry login_check = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.login_check"), Config.LOGIN_CHECK.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.login_check.tooltip"))
+                .setDefaultValue(true)
+                .setSaveConsumer(Config.LOGIN_CHECK::set)
+                .build();
 
         // creative
         TextListEntry creative_description = entryBuilder.startTextDescription(new TranslationTextComponent("mlmod.config.category.creative.tooltip")).build();
-        List<String> ignoredWorlds = new ArrayList<>(Config.IGNORED_WORLDS.get());
         StringListListEntry ignored_worlds = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.ignored_worlds"),
-                        ignoredWorlds)
+                new ArrayList<>(Config.IGNORED_WORLDS.get()))
                 .setTooltip(new TranslationTextComponent("mlmod.config.option.ignored_worlds.tooltip"))
                 .setDefaultValue(Collections.emptyList())
                 .setSaveConsumer(Config.IGNORED_WORLDS::set)
@@ -187,14 +185,31 @@ public class ClothConfig {
                 .build();
 
         // misc
-        misc.addEntry(detect_mineland).addEntry(mineland_ips);
+        BooleanListEntry detect_mineland = entryBuilder.startBooleanToggle(new TranslationTextComponent("mlmod.config.option.detect_mineland"), Config.DETECT_MINELAND.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.detect_mineland.tooltip"))
+                .setDefaultValue(false)
+                .setSaveConsumer(Config.DETECT_MINELAND::set)
+                .build();
+        StringListEntry mineland_ips = entryBuilder.startStrField(new TranslationTextComponent("mlmod.config.option.mineland_ips"), Config.MINELAND_IPS.get())
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.mineland_ips.tooltip"))
+                .setDefaultValue("mineland.net, play-ml.ru")
+                .setSaveConsumer(Config.MINELAND_IPS::set)
+                .build();
+        StringListListEntry command_aliases = entryBuilder.startStrList(new TranslationTextComponent("mlmod.config.option.command_aliases"),
+                        new ArrayList<>(Config.COMMAND_ALIASES.get()))
+                .setTooltip(new TranslationTextComponent("mlmod.config.option.command_aliases.tooltip"))
+                .setDefaultValue(new ArrayList<>(Arrays.asList("кк:креативкоины", "з:золото")))
+                .setSaveConsumer(Config.COMMAND_ALIASES::set)
+                .build();
+
+        misc.addEntry(detect_mineland).addEntry(mineland_ips).addEntry(command_aliases);
 
         general.addEntry(general_description).addEntry(ignored_players).addEntry(chat_player_interact).addEntry(ads)
-                .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate).addEntry(excl_mark_to_chat);
+                .addEntry(pm_notification).addEntry(message_collector).addEntry(hide_translate).addEntry(excl_mark_to_chat).addEntry(messages_in_actionbar);
 
         general_messages.addEntry(general_messages_description).addEntry(reward_storage).addEntry(welcome_to_mineland).addEntry(unanswered_asks).addEntry(unread_mail)
                 .addEntry(new_video).addEntry(punishment_broadcast).addEntry(donation).addEntry(player_voted)
-                .addEntry(stream).addEntry(new_ask);
+                .addEntry(stream).addEntry(new_ask).addEntry(login_check);
 
         creative.addEntry(creative_description).addEntry(ignored_worlds).addEntry(world_invite).addEntry(show_world_id).addEntry(dev_mode_join)
                 .addEntry(play_sound).addEntry(sound_command).addEntry(dev_night_mode).addEntry(dev_night_mode_time).addEntry(show_message_ads);
